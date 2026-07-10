@@ -87,6 +87,11 @@ prints an `ACTION` block, and exits `10`; the agent handles that stage and re-ru
 until exit `0`. See `skills/build-cogmap/SKILL.md` for the full loop and the three
 agent prompt templates.
 
+Under the hood, CogMap uses agents as temporary cognitive workers while the
+Python pipeline remains the durable system of record. Extraction can fan out
+across multiple sub-agents — one per changed batch — while separate
+higher-reasoning passes handle concept resolution and synthesis.
+
 > **`.onex` note:** direct OneNote `.onex` re-extraction recovers only ~66% of
 > prose. For full fidelity, supply a clean `.md`/`.txt` export instead. Ask the
 > agent to use `--from-onex` only for `.onex`-only updates.

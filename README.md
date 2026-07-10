@@ -50,6 +50,19 @@ evolving landscape of thought.
 - Ships with a GitHub Copilot / Claude Code skill for agent-assisted refreshes.
 - Outputs a portable HTML artifact with embedded data and no server requirement.
 
+## How CogMap uses agents
+
+CogMap is built as a deterministic pipeline with agent-powered semantic stages.
+The Python orchestrator handles file discovery, chunking, caching, aggregation,
+graph assembly, and HTML rendering. When a semantic step is needed, it emits a
+structured action file and lets the host coding agent do the LLM work.
+
+For large corpora, extraction can fan out across multiple sub-agents — one per
+batch of changed chunks — so only the changed parts of the knowledge base are
+re-read. Separate higher-reasoning passes then handle concept resolution and
+synthesis. In other words, CogMap uses agents as temporary cognitive workers,
+while the pipeline remains the durable system of record.
+
 ## Quick start
 
 CogMap is designed to run **inside a coding agent** such as GitHub Copilot,
