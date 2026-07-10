@@ -1,0 +1,59 @@
+2025-01-08 — Starting a research journal on the future of urban mobility. Goal: track how my thinking evolves as I read across transit, micromobility, autonomy, and city policy. First impression: the field is fragmented and everyone optimizes their own layer.
+
+2025-01-10 — Read a piece arguing that e-bikes, not autonomous cars, are the real near-term revolution. The economics are absurdly favorable: a fraction of the cost, no parking footprint, and they thrive in exactly the dense corridors where cars fail.
+
+2025-01-12 — Micromobility note: shared e-scooters had a rough first wave. Unit economics were terrible because vehicles broke within months. Newer fleets use ruggedized hardware with swappable batteries, and the payback period finally looks sane.
+
+2025-01-15 — Open question: do e-scooters actually replace car trips, or do they mostly replace walking? If they replace walking, the climate case weakens considerably. I keep seeing both claims and I don't trust either yet.
+
+2025-01-18 — Congestion pricing is the single highest-leverage policy lever I've found so far. London and Stockholm both show durable traffic reductions. The politics are brutal, but the demand response is real and fast.
+
+2025-01-22 — Decision: I'm going to treat "reduce car dependence" as the north star metric, not "adopt any specific technology." Too many analyses conflate the tool with the outcome.
+
+2025-01-25 — Read about the 15-minute city concept. The core idea: reorganize land use so daily needs are within a short walk or ride. It reframes mobility as a symptom of urban design rather than a problem to be solved with vehicles.
+
+2025-01-28 — Tension: the 15-minute city assumes you can co-locate jobs and housing, but decades of zoning did the opposite. Retrofitting is a generational project, not a product launch.
+
+2025-02-02 — Autonomous vehicles update: robotaxi services are finally running driverless in a few cities. Impressive, but the operating domain is still narrow and heavily mapped. Generalization to messy streets remains unproven.
+
+2025-02-05 — Prediction: autonomous shuttles on fixed routes will scale before general robotaxis. Constrained routes shrink the long tail of edge cases, and transit agencies are motivated buyers.
+
+2025-02-08 — Safety note: the hard part of autonomy isn't the average case, it's the rare, weird interaction — a kid chasing a ball, a flooded intersection. Miles-per-intervention is a misleading metric because the tail dominates risk.
+
+2025-02-12 — Data point: most urban car trips are under 5 km. That's the exact range where e-bikes and transit are competitive. The addressable market for replacing short car trips is enormous and under-served.
+
+2025-02-15 — Charging infrastructure keeps coming up as the hidden bottleneck for electrification. It's less about battery chemistry and more about where and how fast you can plug in. Curbside charging in dense neighborhoods is basically unsolved.
+
+2025-02-18 — Revisiting my earlier scooter skepticism. New study suggests that when scooters connect to transit stops, they extend transit's catchment and DO pull trips off cars. The "first and last mile" framing matters more than I gave it credit for.
+
+2025-02-22 — Contradiction with my Jan 15 note: the walking-replacement worry seems mode-specific. Scooters near transit substitute for cars; scooters in already-walkable cores substitute for walking. Context determines the climate impact.
+
+2025-02-25 — Bus rapid transit (BRT) is underrated. Dedicated lanes plus signal priority get you most of the benefit of light rail at a fraction of the capital cost and a fraction of the timeline. Political will is the constraint, not engineering.
+
+2025-03-01 — Decision: I'll weight solutions by "benefit per year of deployment time." A mediocre bus lane next year can beat a perfect rail line in fifteen years. Speed of deployment is itself a feature.
+
+2025-03-04 — Energy note: vehicle-to-grid could turn parked EVs into distributed storage. Fascinating, but it depends on charging standards and utility incentives that mostly don't exist yet. Filed under "promising but blocked."
+
+2025-03-08 — Read a sharp critique of autonomy hype: even a perfect self-driving car still takes up road space and encourages sprawl. Automating the car doesn't fix the geometry problem — moving people in single-occupant boxes is spatially inefficient no matter who drives.
+
+2025-03-11 — The geometry argument is reframing my whole model. Mobility is fundamentally a spatial-efficiency problem. Anything that moves more people through the same street space wins: transit, bikes, walking. Cars lose on geometry, autonomous or not.
+
+2025-03-15 — Governance question: who owns the curb? Delivery, ride-hail, scooters, buses, and parking all fight over the same few meters. Curb management may be the most contested and least digitized part of the whole system.
+
+2025-03-18 — Prediction: dynamic curb pricing (like congestion pricing, but for the curb) will emerge within a decade in major cities. The data to enable it is finally becoming available.
+
+2025-03-22 — Equity tension keeps recurring: congestion pricing and premium mobility can entrench access gaps. Any pricing scheme needs a rebate or transit-investment mechanism or it just taxes the people with the fewest alternatives.
+
+2025-03-25 — Synthesis forming: the winning strategy isn't a single technology, it's a stack — pricing to manage demand, transit and bikes for capacity, autonomy only where it's constrained, all coordinated by better curb and street data.
+
+2025-03-29 — Observation: the cities making progress treat streets as software — instrumented, re-allocatable, priced. The laggards treat streets as fixed concrete. The mental model of "reprogrammable street space" predicts who's moving fast.
+
+2025-04-02 — Reading on induced demand: adding road capacity reliably fills up with new traffic. This is the strongest single argument against building our way out of congestion, and it's remarkably well documented.
+
+2025-04-05 — Induced demand cuts both ways: reducing car lanes can also reduce total car traffic (evaporating demand), not just displace it. That's counterintuitive and politically explosive, but the evidence is surprisingly solid.
+
+2025-04-08 — Decision: I now think the highest-impact interventions are the boring ones — bus lanes, protected bike lanes, congestion and curb pricing — not the flashy ones. The tech that matters is pricing and allocation, not vehicles.
+
+2025-04-12 — Open question for next quarter: how do freight and delivery fit? Everything I've read is passenger-centric, but urban logistics is exploding and cargo bikes plus micro-hubs look like an underexplored answer.
+
+2025-04-15 — Closing reflection: my model went from "which vehicle wins?" to "how do we price and allocate scarce street space?" The vehicle question turned out to be downstream of the geometry-and-pricing question. That reframing is the biggest update of this whole journal.

@@ -1,0 +1,446 @@
+{
+ "concepts": [
+  {
+   "canonical": "autonomous vehicles",
+   "label": "Autonomous vehicles",
+   "type": "Technology",
+   "category": "Autonomous & Automated",
+   "definition": "Driverless cars and shuttles whose promise is constrained by mapped domains, edge cases, road space, and sprawl.",
+   "members": [
+    "autonomous vehicles",
+    "AVs",
+    "autonomous cars",
+    "autonomy",
+    "self-driving cars"
+   ]
+  },
+  {
+   "canonical": "robotaxi services",
+   "label": "Robotaxi services",
+   "type": "Product",
+   "category": "Autonomous & Automated",
+   "definition": "Driverless taxi services running in a few cities but limited by narrow, heavily mapped domains.",
+   "members": [
+    "robotaxi services",
+    "driverless robotaxis",
+    "general robotaxis"
+   ]
+  },
+  {
+   "canonical": "autonomous shuttles",
+   "label": "Autonomous shuttles",
+   "type": "Technology",
+   "category": "Autonomous & Automated",
+   "definition": "Fixed-route autonomous vehicles predicted to scale before general robotaxis.",
+   "members": [
+    "autonomous shuttles"
+   ]
+  },
+  {
+   "canonical": "edge cases",
+   "label": "Edge cases",
+   "type": "Risk",
+   "category": "Autonomous & Automated",
+   "definition": "Rare, weird street interactions that dominate autonomy safety risk.",
+   "members": [
+    "edge cases",
+    "long tail of edge cases",
+    "rare interactions"
+   ]
+  },
+  {
+   "canonical": "miles-per-intervention",
+   "label": "Miles-per-intervention",
+   "type": "Metric",
+   "category": "Autonomous & Automated",
+   "definition": "An autonomy metric called misleading because rare tail events dominate risk.",
+   "members": [
+    "miles-per-intervention"
+   ]
+  },
+  {
+   "canonical": "deployment speed",
+   "label": "Deployment speed",
+   "type": "Metric",
+   "category": "Autonomous & Automated",
+   "definition": "A criterion that weights benefits by how quickly an intervention can be delivered.",
+   "members": [
+    "deployment speed",
+    "benefit per year of deployment time",
+    "speed of deployment"
+   ]
+  },
+  {
+   "canonical": "street data",
+   "label": "Street data",
+   "type": "Technology",
+   "category": "Autonomous & Automated",
+   "definition": "Data that enables dynamic curb pricing, coordinated mobility stacks, and reprogrammable streets.",
+   "members": [
+    "street data",
+    "curb and street data"
+   ]
+  },
+  {
+   "canonical": "e-bikes",
+   "label": "E-bikes",
+   "type": "Technology",
+   "category": "Active & Micromobility",
+   "definition": "Low-cost electric bikes with little parking footprint that work well in dense corridors and short trips.",
+   "members": [
+    "e-bikes",
+    "bikes",
+    "electric bikes"
+   ]
+  },
+  {
+   "canonical": "shared e-scooters",
+   "label": "Shared e-scooters",
+   "type": "Technology",
+   "category": "Active & Micromobility",
+   "definition": "Shared micromobility vehicles whose economics and climate value depend on durability and trip context.",
+   "members": [
+    "shared e-scooters",
+    "e-scooters",
+    "scooters"
+   ]
+  },
+  {
+   "canonical": "protected bike lanes",
+   "label": "Protected bike lanes",
+   "type": "Method",
+   "category": "Active & Micromobility",
+   "definition": "Protected cycling lanes named as a boring but high-impact intervention.",
+   "members": [
+    "protected bike lanes"
+   ]
+  },
+  {
+   "canonical": "cargo bikes and micro-hubs",
+   "label": "Cargo bikes and micro-hubs",
+   "type": "Concept",
+   "category": "Active & Micromobility",
+   "definition": "A potential underexplored answer for exploding urban logistics.",
+   "members": [
+    "cargo bikes and micro-hubs",
+    "cargo bikes",
+    "micro-hubs"
+   ]
+  },
+  {
+   "canonical": "short urban car trips",
+   "label": "Short urban car trips",
+   "type": "Concept",
+   "category": "Active & Micromobility",
+   "definition": "Mostly sub-5 km urban car trips that e-bikes and transit can address.",
+   "members": [
+    "short urban car trips",
+    "short car trips",
+    "urban car trips under 5 km"
+   ]
+  },
+  {
+   "canonical": "walking replacement risk",
+   "label": "Walking replacement risk",
+   "type": "Risk",
+   "category": "Active & Micromobility",
+   "definition": "The concern that scooters may replace walking rather than car trips, weakening climate benefits.",
+   "members": [
+    "walking replacement risk",
+    "walking-replacement worry"
+   ]
+  },
+  {
+   "canonical": "transit",
+   "label": "Transit",
+   "type": "Technology",
+   "category": "Public Transit",
+   "definition": "A capacity-focused mobility mode that can be extended by scooters and strengthened by investment.",
+   "members": [
+    "transit",
+    "public transit"
+   ]
+  },
+  {
+   "canonical": "dedicated bus lanes",
+   "label": "Dedicated bus lanes",
+   "type": "Method",
+   "category": "Public Transit",
+   "definition": "Street lanes reserved for buses that improve transit and can deploy faster than rail.",
+   "members": [
+    "dedicated bus lanes",
+    "bus lanes"
+   ]
+  },
+  {
+   "canonical": "bus rapid transit",
+   "label": "Bus rapid transit",
+   "type": "Technology",
+   "category": "Public Transit",
+   "definition": "A bus system using dedicated lanes and signal priority to get much of light rail's benefit faster and cheaper.",
+   "members": [
+    "bus rapid transit",
+    "BRT"
+   ]
+  },
+  {
+   "canonical": "first and last mile transit",
+   "label": "First and last mile transit",
+   "type": "Concept",
+   "category": "Public Transit",
+   "definition": "Connections to transit stops that extend transit catchment and can pull trips off cars.",
+   "members": [
+    "first and last mile transit",
+    "first/last mile",
+    "transit catchment"
+   ]
+  },
+  {
+   "canonical": "geometry problem",
+   "label": "Geometry problem",
+   "type": "Concept",
+   "category": "Street Space & Curb",
+   "definition": "The spatial inefficiency of moving people in single-occupant boxes regardless of driver.",
+   "members": [
+    "geometry problem",
+    "geometry argument"
+   ]
+  },
+  {
+   "canonical": "spatial efficiency",
+   "label": "Spatial efficiency",
+   "type": "Metric",
+   "category": "Street Space & Curb",
+   "definition": "Moving more people through the same street space, favoring transit, bikes, and walking over cars.",
+   "members": [
+    "spatial efficiency",
+    "spatial-efficiency problem"
+   ]
+  },
+  {
+   "canonical": "curb management",
+   "label": "Curb management",
+   "type": "Method",
+   "category": "Street Space & Curb",
+   "definition": "Governance of contested curb space used by delivery, ride-hail, scooters, buses, and parking.",
+   "members": [
+    "curb management",
+    "curb ownership"
+   ]
+  },
+  {
+   "canonical": "reprogrammable street space",
+   "label": "Reprogrammable street space",
+   "type": "Concept",
+   "category": "Street Space & Curb",
+   "definition": "Streets treated as instrumented, re-allocatable, and priced rather than fixed concrete.",
+   "members": [
+    "reprogrammable street space",
+    "streets as software"
+   ]
+  },
+  {
+   "canonical": "reduced car dependence",
+   "label": "Reduced car dependence",
+   "type": "Metric",
+   "category": "Street Space & Curb",
+   "definition": "The author's chosen north star metric for judging mobility solutions.",
+   "members": [
+    "reduced car dependence",
+    "reduce car dependence"
+   ]
+  },
+  {
+   "canonical": "congestion pricing",
+   "label": "Congestion pricing",
+   "type": "Method",
+   "category": "Pricing & Demand",
+   "definition": "A road-pricing policy described as producing fast, durable traffic reductions.",
+   "members": [
+    "congestion pricing"
+   ]
+  },
+  {
+   "canonical": "pricing and allocation",
+   "label": "Pricing and allocation",
+   "type": "Method",
+   "category": "Pricing & Demand",
+   "definition": "The final framing that scarce street space should be priced and allocated rather than solved by vehicles.",
+   "members": [
+    "pricing and allocation",
+    "price and allocate scarce street space"
+   ]
+  },
+  {
+   "canonical": "induced demand",
+   "label": "Induced demand",
+   "type": "Concept",
+   "category": "Pricing & Demand",
+   "definition": "The tendency for added road capacity to fill with new traffic.",
+   "members": [
+    "induced demand"
+   ]
+  },
+  {
+   "canonical": "evaporating demand",
+   "label": "Evaporating demand",
+   "type": "Concept",
+   "category": "Pricing & Demand",
+   "definition": "The effect where reducing car lanes can reduce total car traffic rather than merely displacing it.",
+   "members": [
+    "evaporating demand"
+   ]
+  },
+  {
+   "canonical": "dynamic curb pricing",
+   "label": "Dynamic curb pricing",
+   "type": "Method",
+   "category": "Pricing & Demand",
+   "definition": "Pricing curb use dynamically, predicted to emerge in major cities within a decade.",
+   "members": [
+    "dynamic curb pricing"
+   ]
+  },
+  {
+   "canonical": "15-minute city",
+   "label": "15-minute city",
+   "type": "Concept",
+   "category": "Land Use & Urban Form",
+   "definition": "A land-use model where daily needs are within a short walk or ride.",
+   "members": [
+    "15-minute city"
+   ]
+  },
+  {
+   "canonical": "zoning reform",
+   "label": "Zoning reform",
+   "type": "Method",
+   "category": "Land Use & Urban Form",
+   "definition": "Changing zoning is implied as needed because past zoning separated jobs and housing.",
+   "members": [
+    "zoning reform",
+    "zoning"
+   ]
+  },
+  {
+   "canonical": "jobs-housing co-location",
+   "label": "Jobs-housing co-location",
+   "type": "Concept",
+   "category": "Land Use & Urban Form",
+   "definition": "Placing jobs and housing near each other, an assumption of the 15-minute city.",
+   "members": [
+    "jobs-housing co-location",
+    "co-locate jobs and housing"
+   ]
+  },
+  {
+   "canonical": "context-dependent mode shift",
+   "label": "Context-dependent mode shift",
+   "type": "Concept",
+   "category": "Land Use & Urban Form",
+   "definition": "The idea that scooter substitution differs by setting, replacing cars near transit and walking in walkable cores.",
+   "members": [
+    "context-dependent mode shift",
+    "context determines climate impact"
+   ]
+  },
+  {
+   "canonical": "charging infrastructure",
+   "label": "Charging infrastructure",
+   "type": "Technology",
+   "category": "Electrification & Energy",
+   "definition": "The hidden electrification bottleneck around where and how fast vehicles can plug in.",
+   "members": [
+    "charging infrastructure"
+   ]
+  },
+  {
+   "canonical": "curbside charging",
+   "label": "Curbside charging",
+   "type": "Technology",
+   "category": "Electrification & Energy",
+   "definition": "Dense-neighborhood vehicle charging at the curb, described as basically unsolved.",
+   "members": [
+    "curbside charging"
+   ]
+  },
+  {
+   "canonical": "swappable batteries",
+   "label": "Swappable batteries",
+   "type": "Technology",
+   "category": "Electrification & Energy",
+   "definition": "Battery systems in newer scooter fleets that help make payback periods more viable.",
+   "members": [
+    "swappable batteries"
+   ]
+  },
+  {
+   "canonical": "vehicle-to-grid",
+   "label": "Vehicle-to-grid",
+   "type": "Technology",
+   "category": "Electrification & Energy",
+   "definition": "Using parked EVs as distributed storage, blocked by missing standards and incentives.",
+   "members": [
+    "vehicle-to-grid",
+    "V2G"
+   ]
+  },
+  {
+   "canonical": "urban mobility",
+   "label": "Urban mobility",
+   "type": "Theme",
+   "category": "Systems & Strategy",
+   "definition": "A field spanning transit, micromobility, autonomy, and city policy.",
+   "members": [
+    "urban mobility",
+    "future of urban mobility"
+   ]
+  },
+  {
+   "canonical": "mobility layer fragmentation",
+   "label": "Mobility layer fragmentation",
+   "type": "Risk",
+   "category": "Systems & Strategy",
+   "definition": "The risk that each actor optimizes its own layer instead of the whole mobility system.",
+   "members": [
+    "mobility layer fragmentation",
+    "fragmented field"
+   ]
+  },
+  {
+   "canonical": "mobility stack",
+   "label": "Mobility stack",
+   "type": "Concept",
+   "category": "Systems & Strategy",
+   "definition": "A strategy combining demand pricing, transit and bikes, constrained autonomy, and better curb and street data.",
+   "members": [
+    "mobility stack",
+    "stack",
+    "winning strategy"
+   ]
+  },
+  {
+   "canonical": "urban logistics",
+   "label": "Urban logistics",
+   "type": "Theme",
+   "category": "Systems & Strategy",
+   "definition": "The freight and delivery side of mobility that the author identifies for future study.",
+   "members": [
+    "urban logistics",
+    "freight and delivery"
+   ]
+  },
+  {
+   "canonical": "equity",
+   "label": "Equity",
+   "type": "Theme",
+   "category": "Systems & Strategy",
+   "definition": "The concern that pricing and premium mobility can entrench access gaps without safeguards.",
+   "members": [
+    "equity",
+    "access gaps",
+    "equity tension"
+   ]
+  }
+ ]
+}

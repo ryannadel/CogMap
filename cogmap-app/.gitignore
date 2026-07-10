@@ -1,0 +1,26 @@
+# Project-local CogMap workspace (created when the skill runs; never commit it)
+cogmap/
+.cogmap_initialized
+
+# Regenerable pipeline intermediates (rebuilt on every refresh run), wherever a
+# workspace/work dir is created
+**/work/v3_batches/
+**/work/refresh_delta/
+**/work/refresh_cache/
+**/work/v3_chunks_master.json
+**/work/v3_aggregate.json
+**/work/v3_raw_concepts.json
+**/work/v3_synth_input.json
+
+# Python cruft
+__pycache__/
+*.pyc
+
+# Confidential / raw note exports — users' own OneNote packages must never be
+# committed or bundled into the distributed skill (drop them in a workspace
+# sources/ locally; convert with --from-onex).
+*.onex
+
+# The bundled demo under skills/build-cogmap/assets/demo/ IS tracked on purpose
+# (sources + work/v3_extract + v3_resolved.json + v3_insights.json + output) so a
+# fresh install renders immediately.

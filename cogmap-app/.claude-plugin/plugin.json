@@ -1,0 +1,15 @@
+{
+  "name": "cogmap-knowledge-base",
+  "version": "1.0.0",
+  "description": "Refresh and rebuild the CogMap Minard-style knowledge-base visualization from reading notes. Incremental, LLM-in-the-loop (no API key): only changed notes are re-extracted, only new concepts re-clustered, only a moved graph re-synthesized.",
+  "author": {
+    "name": "CogMap"
+  },
+  "keywords": [
+    "knowledge-graph",
+    "visualization",
+    "notes",
+    "minard",
+    "incremental-extraction"
+  ]
+}

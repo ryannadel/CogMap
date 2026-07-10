@@ -1,0 +1,4 @@
+# Runtime dependency for the CogMap KB pipeline.
+# Only needed if you re-extract the OneNote .onex directly (refresh.py --from-onex).
+# The rest of the pipeline is pure standard library.
+olefile>=0.47

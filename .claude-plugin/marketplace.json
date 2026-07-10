@@ -1,0 +1,17 @@
+{
+  "name": "cogmap",
+  "owner": {
+    "name": "ryannadel"
+  },
+  "metadata": {
+    "description": "CogMap — an LLM-in-the-loop, Minard-style knowledge-base visualization built from your reading notes.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "cogmap-knowledge-base",
+      "source": "./cogmap-app",
+      "description": "Refresh and rebuild the CogMap Minard-style knowledge-base visualization from reading notes. Incremental, LLM-in-the-loop (no API key): only changed notes are re-extracted, only new concepts re-clustered, only a moved graph re-synthesized."
+    }
+  ]
+}

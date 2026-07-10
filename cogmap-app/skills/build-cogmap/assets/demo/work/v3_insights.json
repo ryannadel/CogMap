@@ -1,0 +1,193 @@
+{
+  "insights": [
+    {
+      "type": "Rising",
+      "node": "concept_195704cbc502",
+      "title": "Transit reasserts itself as the capacity backbone",
+      "detail": "Absent early (first at 38%) but rising into the second half, transit is reframed as the high-capacity spine that scooters feed and short-trip substitution and investment strengthen."
+    },
+    {
+      "type": "Rising",
+      "node": "concept_b4461667aa30",
+      "title": "Congestion pricing emerges as the highest-leverage lever",
+      "detail": "Gaining momentum late (early=1, late=3, last at 93%), pricing is cast as the fast, durable demand tool that enables reduced car dependence more reliably than any vehicle."
+    },
+    {
+      "type": "Rising",
+      "node": "concept_8d7c69bb2f14",
+      "title": "E-bikes climb from footnote to workhorse mode",
+      "detail": "Appearing from 3% but strengthening late, low-cost e-bikes with tiny parking footprints become the pragmatic answer for dense corridors and the short car trips they replace."
+    },
+    {
+      "type": "Emerging",
+      "node": "concept_897092538b08",
+      "title": "Street data surfaces late as the missing substrate",
+      "detail": "First appearing at 72% and mentioned only in the second half, street data arrives late but underwrites dynamic curb pricing, the mobility stack, and reprogrammable streets."
+    },
+    {
+      "type": "Bridge",
+      "node": "concept_45f869715199",
+      "title": "Autonomy: the hyped hub that the argument dismantles",
+      "detail": "Central by salience yet contradicted twice, self-driving cars still occupy inefficient road space and hit edge cases, so the corpus subordinates them to pricing and geometry."
+    },
+    {
+      "type": "Bridge",
+      "node": "concept_897092538b08",
+      "title": "Street data links curb pricing to the mobility stack",
+      "detail": "Street data is the connective node that enables dynamic curb pricing and coordinated mobility stacks, turning static roads into reprogrammable, priced space."
+    },
+    {
+      "type": "Bridge",
+      "node": "concept_5da10cddcb4d",
+      "title": "The mobility stack bundles the whole argument",
+      "detail": "Emerging from street data and evolving toward constrained autonomy, the mobility stack fuses demand pricing, transit and bikes, and better curb data into one strategy."
+    },
+    {
+      "type": "Bridge",
+      "node": "concept_2ed4bb4e3358",
+      "title": "Pricing and allocation is the corpus's closing thesis",
+      "detail": "Arriving at the very end (93-100%), this framing evolves from the geometry problem and concludes that scarce street space should be priced and allocated, not engineered away by vehicles."
+    },
+    {
+      "type": "Bridge",
+      "node": "concept_b1f8e90c5cd7",
+      "title": "Shared e-scooters bridge micromobility to transit",
+      "detail": "Scooters connect fragile unit economics to system value by enabling first-and-last-mile access, making their worth contingent on durability and trip context."
+    },
+    {
+      "type": "Bridge",
+      "node": "concept_b4461667aa30",
+      "title": "Congestion pricing bridges demand policy and street space",
+      "detail": "Pricing links the demand and street-space categories: it enables reduced car dependence yet risks entrenching access gaps without rebates or transit reinvestment."
+    },
+    {
+      "type": "Tension",
+      "node": "concept_0316de1794db",
+      "title": "Miles-per-intervention hides the tail that kills",
+      "detail": "The headline autonomy metric conflicts with edge cases: averaging away rare tail events masks the very risks that dominate real-world safety."
+    },
+    {
+      "type": "Tension",
+      "node": "concept_3328683e8761",
+      "title": "Even driverless, the geometry problem doesn't budge",
+      "detail": "Autonomy hype collides with spatial reality: single-occupant boxes waste road space regardless of who (or what) drives, so the geometry problem outlasts the tech."
+    },
+    {
+      "type": "Tension",
+      "node": "concept_2ed4bb4e3358",
+      "title": "Pricing beats vehicles as the real solution",
+      "detail": "The author sets pricing and allocation against autonomous vehicles and concludes that allocating scarce space matters more than any new vehicle class."
+    },
+    {
+      "type": "Tension",
+      "node": "concept_06c76d1805fd",
+      "title": "The 15-minute city: reframe or wishful zoning?",
+      "detail": "One take treats it as reframing mobility as urban-design symptom; the other notes decades of zoning did the opposite of the jobs-housing co-location it assumes."
+    },
+    {
+      "type": "Tension",
+      "node": "concept_b1f8e90c5cd7",
+      "title": "Scooters: broken economics vs. context-specific value",
+      "detail": "Early worries about walking replacement and month-long vehicle lifespans clash with later evidence that scooter impacts are mode-specific and context-dependent."
+    },
+    {
+      "type": "Tension",
+      "node": "concept_b4461667aa30",
+      "title": "Congestion pricing's efficiency-vs-equity fault line",
+      "detail": "Pricing is praised for fast, durable demand response yet flagged for entrenching access gaps, unless paired with rebates or transit investment."
+    },
+    {
+      "type": "Question",
+      "node": "concept_8b6c98fb417a",
+      "title": "Who governs the contested curb?",
+      "detail": "Open question: with delivery, ride-hail, scooters, buses, and parking all competing, how should the curb be managed and dynamically priced?"
+    },
+    {
+      "type": "Question",
+      "node": "concept_b1f8e90c5cd7",
+      "title": "Can shared scooters ever pay for themselves?",
+      "detail": "Open question: do scooter economics and climate value hold once durability and trip context are accounted for, or is subsidized first/last-mile the only rationale?"
+    },
+    {
+      "type": "Question",
+      "node": "concept_9869959f5b5e",
+      "title": "Urban logistics: the freight blind spot",
+      "detail": "Flagged for future study, the freight and delivery side of mobility remains under-examined even as it drives curb demand via cargo bikes and micro-hubs."
+    }
+  ],
+  "synthesis": [
+    {
+      "title": "Geometry, not autonomy, is the binding constraint — so price the space",
+      "detail": "The corpus repeatedly subordinates vehicle tech to spatial scarcity: the geometry problem evolves directly into pricing and allocation, and autonomous vehicles are contradicted for still occupying inefficient road space. Induced demand explains why adding capacity fails, making priced allocation the load-bearing conclusion.",
+      "nodes": [
+        "concept_3328683e8761",
+        "concept_2ed4bb4e3358",
+        "concept_903d19b52e06",
+        "concept_45f869715199"
+      ]
+    },
+    {
+      "title": "Autonomy's edge-case tail quietly undercuts its deployment optimism",
+      "detail": "Miles-per-intervention averages away the rare edge cases that dominate safety, yet these fade early (edge cases and robotaxis appear before ~34% then vanish). Deployment speed is pitched to reduce car dependence, but the unresolved tail means the fast-rollout story rests on a metric the corpus explicitly calls misleading.",
+      "nodes": [
+        "concept_0316de1794db",
+        "concept_3c7032c77191",
+        "concept_3ea071bff191",
+        "concept_45f869715199"
+      ]
+    },
+    {
+      "title": "Street data is the hidden substrate that makes pricing, curb, and stack cohere",
+      "detail": "Emerging late (72%), street data enables dynamic curb pricing, the mobility stack, and reprogrammable street space simultaneously. It is the connective infrastructure without which curb management stays contested and priced allocation stays theoretical — the quiet enabler beneath the headline policies.",
+      "nodes": [
+        "concept_897092538b08",
+        "concept_5a6b74f5fa36",
+        "concept_9afec68851d7",
+        "concept_8b6c98fb417a",
+        "concept_5da10cddcb4d"
+      ]
+    },
+    {
+      "title": "Micromobility earns its keep only as transit's first-and-last-mile feeder",
+      "detail": "Shared e-scooters enable first-and-last-mile transit while e-bikes absorb short urban car trips — both rising modes that feed rather than replace the capacity spine. Their fragile standalone economics resolve when read as complements to transit, not competitors, reframing the walking-replacement worry as context-specific.",
+      "nodes": [
+        "concept_b1f8e90c5cd7",
+        "concept_8d7c69bb2f14",
+        "concept_a276bdf8edbc",
+        "concept_195704cbc502",
+        "concept_2fd63eff9e54"
+      ]
+    },
+    {
+      "title": "Land use and mobility co-evolve: the 15-minute city is a zoning problem in disguise",
+      "detail": "The 15-minute city evolves into the broader urban-mobility frame, reducing car dependence via proximity rather than vehicles. But it presumes jobs-housing co-location that only zoning reform can deliver — decades of which did the opposite — so the demand-side fix hinges on land-use politics, not transport tech.",
+      "nodes": [
+        "concept_06c76d1805fd",
+        "concept_28733e2f7ccf",
+        "concept_3aef7bd661b9",
+        "concept_9eb51cebabe6"
+      ]
+    },
+    {
+      "title": "Congestion pricing's leverage is real but forks on equity",
+      "detail": "Rising late, congestion pricing enables reduced car dependence with fast, durable response — the corpus's highest-leverage lever. Yet the same mechanism can entrench access gaps, so its verdict depends on coupling revenue to rebates and transit investment, tying pricing directly to the equity strand.",
+      "nodes": [
+        "concept_b4461667aa30",
+        "concept_9eb51cebabe6",
+        "concept_6caa192350fc",
+        "concept_195704cbc502"
+      ]
+    },
+    {
+      "title": "Electrification collides with the curb — energy needs are a street-space claim",
+      "detail": "Charging infrastructure, curbside charging, and vehicle-to-grid all convert scarce curb into an energy asset, while swappable batteries route around it to power shared scooters. Electrification thus becomes another claimant in the contested curb, reinforcing that street-space allocation — not the battery — is the real bottleneck.",
+      "nodes": [
+        "concept_c0849609170b",
+        "concept_c367e7bf8f18",
+        "concept_00ce20418e86",
+        "concept_db556d16d508",
+        "concept_8b6c98fb417a"
+      ]
+    }
+  ]
+}

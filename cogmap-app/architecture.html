@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CogMap Architecture</title>
+<script>
+  (() => {
+    const param = new URLSearchParams(window.location.search).get("clawpilotTheme");
+    const theme =
+      param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+  })();
+</script>
+<style>
+:root {
+  color-scheme: light;
+  --cp-bg: #f7f4ef;
+  --cp-bg-elevated: #fcfbf8;
+  --cp-surface: #ffffff;
+  --cp-surface-soft: #f5f5f5;
+  --cp-border: #dedede;
+  --cp-border-strong: #919191;
+  --cp-text: #242424;
+  --cp-text-muted: #5c5c5c;
+  --cp-text-soft: #6f6f6f;
+  --cp-accent: #b11f4b;
+  --cp-accent-hover: #9a1a41;
+  --cp-accent-soft: rgba(177, 31, 75, 0.08);
+  --cp-accent-fg: #ffffff;
+  --cp-success: #16a34a;
+  --cp-danger: #dc2626;
+  --cp-warning: #f59e0b;
+  --cp-link: #0078d4;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+  --cp-overlay: rgba(255, 255, 255, 0.8);
+  --cp-panel: rgba(255, 255, 255, 0.86);
+  --cp-panel-strong: rgba(255, 255, 255, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.55);
+  --cp-highlight: rgba(177, 31, 75, 0.12);
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --cp-bg: #3d3b3a;
+  --cp-bg-elevated: #343231;
+  --cp-surface: #292929;
+  --cp-surface-soft: #2e2e2e;
+  --cp-border: #474747;
+  --cp-border-strong: #5f5f5f;
+  --cp-text: #dedede;
+  --cp-text-muted: #919191;
+  --cp-text-soft: #b0b0b0;
+  --cp-accent: #fd8ea1;
+  --cp-accent-hover: #fb7b91;
+  --cp-accent-soft: rgba(253, 142, 161, 0.14);
+  --cp-accent-fg: #1a1a1a;
+  --cp-success: #4ade80;
+  --cp-danger: #f87171;
+  --cp-warning: #fbbf24;
+  --cp-link: #4da6ff;
+  --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+  --cp-overlay: rgba(41, 41, 41, 0.88);
+  --cp-panel: rgba(41, 41, 41, 0.72);
+  --cp-panel-strong: rgba(41, 41, 41, 0.96);
+  --cp-sheen: rgba(255, 255, 255, 0.04);
+  --cp-highlight: rgba(253, 142, 161, 0.12);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--cp-bg);
+  color: var(--cp-text);
+  font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+code, .mono {
+  font-family: Consolas, "Courier New", Courier, monospace;
+}
+a { color: var(--cp-link); }
+.shell {
+  min-height: 100vh;
+}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--cp-border);
+  background: var(--cp-bg-elevated);
+}
+.brand {
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.2px;
+}
+.brand small {
+  display: block;
+  font-weight: 400;
+  color: var(--cp-text-muted);
+  font-size: 11px;
+  letter-spacing: 0;
+}
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 1px solid var(--cp-border);
+  border-radius: 999px;
+  color: var(--cp-text-muted);
+  background: var(--cp-surface);
+  font-size: 12px;
+  font-weight: 600;
+}
+main {
+  width: min(1280px, 100%);
+  margin: 0 auto;
+  padding: 22px;
+}
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.65fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.panel, .card, .stage, .legend, .callout {
+  background: var(--cp-surface);
+  border: 1px solid var(--cp-border);
+  border-radius: 16px;
+}
+.panel {
+  padding: 18px;
+}
+h1, h2, h3, p { margin-top: 0; }
+h1 {
+  margin-bottom: 8px;
+  font-size: clamp(26px, 4vw, 44px);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+h2 {
+  margin-bottom: 4px;
+  font-size: 18px;
+}
+h3 {
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+.lead {
+  max-width: 76ch;
+  color: var(--cp-text-muted);
+  font-size: 15px;
+  margin-bottom: 0;
+}
+.metric-grid {
+  display: grid;
+  gap: 8px;
+}
+.metric {
+  padding: 11px 12px;
+  border-radius: 0.625rem;
+  border: 1px solid var(--cp-border);
+  background: var(--cp-surface-soft);
+}
+.metric b {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--cp-text);
+  font-size: 16px;
+}
+.metric span {
+  color: var(--cp-text-muted);
+  font-size: 12px;
+}
+.map {
+  display: grid;
+  grid-template-columns: 1fr 34px 1fr 34px 1fr;
+  gap: 0;
+  align-items: stretch;
+  margin: 16px 0;
+}
+.lane {
+  display: grid;
+  gap: 12px;
+}
+.stage {
+  position: relative;
+  padding: 15px;
+  min-height: 126px;
+  overflow: hidden;
+}
+.stage::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--cp-accent);
+}
+.stage strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+.stage p {
+  margin: 0;
+  color: var(--cp-text-muted);
+  font-size: 12.5px;
+}
+.stage .path {
+  margin-top: 10px;
+  color: var(--cp-text-soft);
+  font-size: 11px;
+}
+.arrow {
+  display: grid;
+  place-items: center;
+  color: var(--cp-accent);
+  font-size: 28px;
+  font-weight: 700;
+}
+.section-title {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 24px 0 10px;
+}
+.section-title p {
+  color: var(--cp-text-muted);
+  margin: 0;
+  font-size: 12.5px;
+}
+.flow-row {
+  display: grid;
+  grid-template-columns: 1fr 34px 1fr 34px 1fr 34px 1fr;
+  gap: 0;
+  align-items: stretch;
+}
+.step {
+  padding: 14px;
+  border: 1px solid var(--cp-border);
+  background: var(--cp-surface);
+  border-radius: 16px;
+}
+.step .num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-bottom: 8px;
+  border-radius: 999px;
+  background: var(--cp-accent);
+  color: var(--cp-accent-fg);
+  font-size: 12px;
+  font-weight: 700;
+}
+.step p {
+  margin: 0;
+  color: var(--cp-text-muted);
+  font-size: 12.5px;
+}
+.two-col {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.card {
+  padding: 16px;
+}
+.card ul {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--cp-text-muted);
+}
+.card li + li { margin-top: 6px; }
+.workspace {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.folder {
+  min-height: 118px;
+  padding: 14px;
+  border: 1px solid var(--cp-border);
+  border-radius: 16px;
+  background: var(--cp-surface-soft);
+}
+.folder .tab {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 4px 8px;
+  border-radius: 0.625rem;
+  background: var(--cp-accent-soft);
+  color: var(--cp-accent);
+  font-size: 12px;
+  font-weight: 700;
+}
+.folder p {
+  margin: 0;
+  color: var(--cp-text-muted);
+  font-size: 12.5px;
+}
+.state-machine {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.state {
+  padding: 14px;
+  border: 1px solid var(--cp-border);
+  border-radius: 16px;
+  background: var(--cp-surface);
+}
+.state[data-kind="agent"] {
+  background: var(--cp-accent-soft);
+}
+.state .badge {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--cp-border);
+  color: var(--cp-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.callout {
+  margin-top: 16px;
+  padding: 16px;
+  border-left: 4px solid var(--cp-accent);
+}
+.callout p {
+  margin: 0;
+  color: var(--cp-text-muted);
+}
+.legend {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  padding: 12px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--cp-text-muted);
+  font-size: 12px;
+}
+.swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  background: var(--cp-accent);
+}
+.swatch.soft { background: var(--cp-accent-soft); border: 1px solid var(--cp-border); }
+.swatch.success { background: var(--cp-success); }
+.swatch.warning { background: var(--cp-warning); }
+.footer {
+  margin-top: 22px;
+  padding: 14px 0;
+  color: var(--cp-text-muted);
+  font-size: 12px;
+}
+@media (max-width: 980px) {
+  .hero, .two-col { grid-template-columns: 1fr; }
+  .map, .flow-row, .state-machine, .workspace, .legend {
+    grid-template-columns: 1fr;
+  }
+  .arrow {
+    min-height: 28px;
+    transform: rotate(90deg);
+  }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header>
+    <div class="brand">
+      CogMap Architecture
+      <small>Self-contained skill, project-local workspace, incremental graph build</small>
+    </div>
+    <div class="header-actions">
+      <span class="pill">No API key</span>
+      <span class="pill">Agent-in-the-loop</span>
+      <span class="pill">Self-contained HTML output</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="overview">
+      <div class="panel">
+        <h1 id="overview">How CogMap works</h1>
+        <p class="lead">
+          CogMap packages the data-processing engine inside an installable agent skill.
+          The skill never treats its install folder as user data: it creates a local
+          <code>cogmap/</code> workspace, ingests notes from <code>sources/</code>,
+          stores resumable intermediate artifacts in <code>work/</code>, and renders
+          a portable visualization in <code>output/</code>.
+        </p>
+      </div>
+      <aside class="panel metric-grid" aria-label="Architecture facts">
+        <div class="metric"><b>3 folders</b><span>sources, work, output form the runtime workspace</span></div>
+        <div class="metric"><b>5 stages</b><span>prep, extract, aggregate, resolve/synth, render</span></div>
+        <div class="metric"><b>Exit 10</b><span>refresh.py pauses only when an LLM stage is needed</span></div>
+      </aside>
+    </section>
+
+    <section aria-labelledby="big-picture">
+      <div class="section-title">
+        <div>
+          <h2 id="big-picture">Big-picture architecture</h2>
+          <p>Engine code is bundled with the skill; user content and generated output live outside it.</p>
+        </div>
+      </div>
+
+      <div class="map" role="img" aria-label="CogMap high-level architecture diagram">
+        <div class="lane">
+          <div class="stage">
+            <strong>Install surfaces</strong>
+            <p>GitHub Copilot CLI, Claude Code, or Codex discovers the same <code>build-cogmap</code> skill.</p>
+            <div class="path mono">cogmap-app/skills/build-cogmap</div>
+          </div>
+          <div class="stage">
+            <strong>Skill instructions</strong>
+            <p><code>SKILL.md</code> tells the host agent when to run CogMap and how to handle extraction, resolve, and synth actions.</p>
+            <div class="path mono">SKILL.md</div>
+          </div>
+        </div>
+
+        <div class="arrow" aria-hidden="true">></div>
+
+        <div class="lane">
+          <div class="stage">
+            <strong>Bundled engine</strong>
+            <p>Python scripts perform deterministic stages and emit action files for LLM-only work.</p>
+            <div class="path mono">scripts/refresh.py</div>
+          </div>
+          <div class="stage">
+            <strong>Path resolver</strong>
+            <p><code>cogmap_paths.py</code> separates immutable engine code from the local workspace.</p>
+            <div class="path mono">scripts/cogmap_paths.py</div>
+          </div>
+        </div>
+
+        <div class="arrow" aria-hidden="true">></div>
+
+        <div class="lane">
+          <div class="stage">
+            <strong>Project workspace</strong>
+            <p>Runtime data defaults to <code>./cogmap</code> in the directory where the agent runs.</p>
+            <div class="path mono">./cogmap</div>
+          </div>
+          <div class="stage">
+            <strong>Deliverable</strong>
+            <p>The final artifact is a browser-openable, self-contained knowledge map.</p>
+            <div class="path mono">output/knowledge-base-viz.html</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="legend" aria-label="Diagram legend">
+        <div class="legend-item"><span class="swatch"></span>Active pipeline boundary</div>
+        <div class="legend-item"><span class="swatch soft"></span>Agent/LLM-assisted stage</div>
+        <div class="legend-item"><span class="swatch success"></span>Persistent output</div>
+        <div class="legend-item"><span class="swatch warning"></span>Manual note/source input</div>
+      </div>
+    </section>
+
+    <section aria-labelledby="runtime-workspace">
+      <div class="section-title">
+        <div>
+          <h2 id="runtime-workspace">Runtime workspace</h2>
+          <p>The key design choice: install once, write user data locally.</p>
+        </div>
+      </div>
+
+      <div class="workspace">
+        <div class="folder">
+          <span class="tab mono">sources/</span>
+          <h3>User-owned inputs</h3>
+          <p>Markdown, plain text, or optional OneNote conversion output. This is the source of truth for a user's corpus.</p>
+        </div>
+        <div class="folder">
+          <span class="tab mono">work/</span>
+          <h3>Resumable state</h3>
+          <p>Batches, extracted concepts, resolved canonical concepts, synthesized insights, and refresh cache.</p>
+        </div>
+        <div class="folder">
+          <span class="tab mono">output/</span>
+          <h3>Generated artifacts</h3>
+          <p><code>knowledge-base-viz-data.json</code> plus the self-contained <code>knowledge-base-viz.html</code>.</p>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="refresh-flow">
+      <div class="section-title">
+        <div>
+          <h2 id="refresh-flow">Refresh pipeline</h2>
+          <p><code>refresh.py</code> is the orchestrator. It runs deterministic scripts and pauses for LLM work only when needed.</p>
+        </div>
+      </div>
+
+      <div class="flow-row">
+        <div class="step">
+          <span class="num">1</span>
+          <h3>Prepare chunks</h3>
+          <p><code>v3_prep.py</code> discovers note files, chunks readable prose, parses dates, and writes batch inputs.</p>
+        </div>
+        <div class="arrow" aria-hidden="true">></div>
+        <div class="step">
+          <span class="num">2</span>
+          <h3>Extract delta</h3>
+          <p>Only missing or changed chunk IDs become <code>refresh_delta/pending_NN.json</code>. The agent fills extract outputs.</p>
+        </div>
+        <div class="arrow" aria-hidden="true">></div>
+        <div class="step">
+          <span class="num">3</span>
+          <h3>Aggregate</h3>
+          <p><code>v3_aggregate.py</code> merges extraction files, filters stale chunk IDs, and writes raw concepts and relations.</p>
+        </div>
+        <div class="arrow" aria-hidden="true">></div>
+        <div class="step">
+          <span class="num">4</span>
+          <h3>Assemble and render</h3>
+          <p><code>v3_assemble.py</code> builds graph JSON; <code>build_v2.py</code> embeds it into the final HTML.</p>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="state-machine">
+      <div class="section-title">
+        <div>
+          <h2 id="state-machine">Resumable state machine</h2>
+          <p>Exit codes are the contract between deterministic Python and the host coding agent.</p>
+        </div>
+      </div>
+
+      <div class="state-machine">
+        <div class="state">
+          <span class="badge">Start</span>
+          <h3>Run refresh</h3>
+          <p class="mono">python scripts/refresh.py --with-resolve --with-synth</p>
+        </div>
+        <div class="state" data-kind="agent">
+          <span class="badge">Exit 10</span>
+          <h3>Action required</h3>
+          <p>Read <code>work/refresh_cache/action.json</code>. Action is <code>extract</code>, <code>resolve</code>, or <code>synth</code>.</p>
+        </div>
+        <div class="state" data-kind="agent">
+          <span class="badge">Agent work</span>
+          <h3>Fill the artifact</h3>
+          <p>The host agent writes the requested JSON output, grounded in the supplied batch or graph input.</p>
+        </div>
+        <div class="state">
+          <span class="badge">Exit 0</span>
+          <h3>Done</h3>
+          <p>Refresh completes and the user opens <code>cogmap/output/knowledge-base-viz.html</code>.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <h3>Why this design makes sense</h3>
+        <p>
+          CogMap keeps deterministic code deterministic and lets the host agent do only
+          the semantic steps that need judgment: concept extraction, entity resolution,
+          and synthesis. Because every stage writes files, the loop is resumable after
+          interruption and incremental after edits.
+        </p>
+      </div>
+    </section>
+
+    <section aria-labelledby="boundaries">
+      <div class="section-title">
+        <div>
+          <h2 id="boundaries">Important boundaries</h2>
+          <p>These boundaries prevent the old confusion between pipeline code, scratch state, and final artifacts.</p>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <h3>What is packaged</h3>
+          <ul>
+            <li><code>SKILL.md</code> and the agent prompts.</li>
+            <li>Deterministic engine scripts in <code>scripts/</code>.</li>
+            <li>A bundled demo under <code>assets/demo/</code> for first-run behavior.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>What is user/project-local</h3>
+          <ul>
+            <li>The user's notes in <code>cogmap/sources/</code>.</li>
+            <li>LLM artifacts and refresh cache in <code>cogmap/work/</code>.</li>
+            <li>The rendered visualization in <code>cogmap/output/</code>.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      Generated as a static architecture diagram. Open this file directly, or append
+      <span class="mono">?clawpilotTheme=dark</span> / <span class="mono">?clawpilotTheme=light</span>
+      to preview a specific theme.
+    </div>
+  </main>
+</div>
+</body>
+</html>

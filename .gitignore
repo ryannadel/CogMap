@@ -1,0 +1,14 @@
+# Python cruft
+__pycache__/
+*.pyc
+
+# Project-local CogMap workspace (created when running the skill from the repo)
+cogmap/
+.cogmap_initialized
+
+# Confidential personal note exports and the personal knowledge graph built from
+# them — never commit these. (The synthetic demo copies under
+# skills/build-cogmap/assets/demo/ are anchored elsewhere and stay tracked.)
+*.onex
+/knowledge-base-viz.html
+/knowledge-base-viz-data.json
