@@ -68,6 +68,13 @@ cogmap/                              the workspace (created in your working dir)
 Relocate the workspace with `COGMAP_APP` (or the finer `COGMAP_SOURCES` /
 `COGMAP_WORK` / `COGMAP_OUTPUT`; legacy `OSLER_*` names still accepted).
 
+## Prerequisites
+
+- Python 3.10 or newer.
+- GitHub Copilot CLI, Claude Code, or OpenAI Codex CLI.
+- No separate LLM API key. The host coding agent performs the semantic stages.
+- Optional: `olefile` for `.onex` conversion.
+
 ## Quick start (run it with a coding agent)
 
 CogMap is a **coding agent skill**, not a standalone app you run by hand:
@@ -101,10 +108,10 @@ higher-reasoning passes handle concept resolution and synthesis.
 Copy the self-contained skill folder into your Copilot skills directory:
 
 ```bash
-cp -r skills/build-cogmap ~/.copilot/skills/
+cp -r cogmap-app/skills/build-cogmap ~/.copilot/skills/
 ```
 
-(On Windows: copy `skills\build-cogmap` to `%USERPROFILE%\.copilot\skills\`.)
+(On Windows: copy `cogmap-app\skills\build-cogmap` to `%USERPROFILE%\.copilot\skills\`.)
 Then say *"build the knowledge base"*.
 
 ## Install as a Claude Code plugin
@@ -113,7 +120,7 @@ This repo is a Claude Code marketplace (`.claude-plugin/marketplace.json` at the
 repo root) exposing the `cogmap-app` plugin. In Claude Code:
 
 ```
-/plugin marketplace add <your-github-org>/CogMap
+/plugin marketplace add ryannadel/CogMap
 /plugin install cogmap-knowledge-base@cogmap
 ```
 
