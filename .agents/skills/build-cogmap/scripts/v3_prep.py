@@ -36,7 +36,7 @@ MONTHS = {m.lower():i for i,m in enumerate(
 MONTH_ABBR = {'jan':1,'feb':2,'mar':3,'apr':4,'may':5,'jun':6,'jul':7,'aug':8,'sep':9,'sept':9,'oct':10,'nov':11,'dec':12}
 def infer_year(month): return DEFAULT_YEAR
 def safe_date(y, m, d):
-    try: return datetime.date(y, m, min(d, 28))
+    try: return datetime.date(y, m, d)
     except Exception: return None
 def parse_dates(text):
     found=[]; t=text
