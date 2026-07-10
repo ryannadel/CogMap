@@ -116,6 +116,7 @@ Flags:
   Without it, existing insights are reused.
 - `--from-onex` — best-effort re-extract `.onex` → clean text first (~66%).
 - `--skip-resolve`, `--skip-synth` — force-skip those gates.
+- `--no-open` — don't auto-open the finished HTML (also via `COGMAP_NO_OPEN=1`).
 
 **Default recommendation:** `--with-resolve --with-synth` so a real content change
 yields fully-merged concepts and fresh insights. Read `action.json` after every
@@ -194,10 +195,11 @@ Then re-run `refresh.py --with-synth`.
 
 ## When done
 
-On exit 0, report the final line (`DONE. chunks=… tracked-extracted=…`) and tell
-the user to **hard-refresh the browser (Ctrl+Shift+R)** on the workspace
-`output/knowledge-base-viz.html` — for large corpora the embedded page can be
-1 MB+ and can't be reloaded from the agent side.
+On exit 0, report the final line (`DONE. chunks=… tracked-extracted=…`). The
+finished `output/knowledge-base-viz.html` is **auto-opened in the default browser**
+(disable with `--no-open` or `COGMAP_NO_OPEN=1`). If it was already open, tell the
+user to **hard-refresh the browser (Ctrl+Shift+R)** — for large corpora the
+embedded page can be 1 MB+ and can't be reloaded from the agent side.
 
 ## Notes
 

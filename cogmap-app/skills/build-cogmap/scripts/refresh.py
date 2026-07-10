@@ -66,6 +66,38 @@ def run(script):
         print(f'--- {script} FAILED ---\n{r.stdout}\n{r.stderr}'); sys.exit(1)
     return r.stdout.strip()
 
+
+def open_result(html):
+    """Auto-open the finished visualization in the default browser.
+
+    Suppressed with `--no-open` or COGMAP_NO_OPEN=1 (for headless/CI/agent runs).
+    Best-effort: a failure to launch a browser never fails the build.
+    """
+    if '--no-open' in ARGS or os.environ.get('COGMAP_NO_OPEN'):
+        return
+    html = pathlib.Path(html)
+    if not html.exists():
+        return
+    uri = html.resolve().as_uri()
+    try:
+        if sys.platform == 'darwin':
+            subprocess.Popen(['open', str(html)])
+        elif os.name == 'nt':
+            os.startfile(str(html))  # noqa: S606 - trusted local path
+        elif sys.platform.startswith('linux'):
+            subprocess.Popen(['xdg-open', str(html)],
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        else:
+            import webbrowser; webbrowser.open(uri)
+        print('Opened {} in your browser.'.format(html.name))
+    except Exception:
+        try:
+            import webbrowser; webbrowser.open(uri)
+            print('Opened {} in your browser.'.format(html.name))
+        except Exception:
+            print('Open it manually: {}'.format(html))
+
+
 def load_state():
     if STATEF.exists():
         return json.loads(STATEF.read_text(encoding='utf-8'))
@@ -369,6 +401,7 @@ def main():
     save_state(state)
     print('\nDONE. chunks={} tracked-extracted={}'.format(len(current), len(state['extracted_ids'])))
     print('Hard-refresh the browser (Ctrl+Shift+R) to see the update.')
+    open_result(OUTPUT / 'knowledge-base-viz.html')
 
 if __name__ == '__main__':
     main()
