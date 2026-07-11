@@ -20,7 +20,7 @@ Flags:
 """
 import json, re, hashlib, pathlib, subprocess, sys, os, time, shutil
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from cogmap_paths import WORK, OUTPUT, PIPELINE
+from cogmap_paths import WORK, OUTPUT, PIPELINE, load_resolved
 STATE = WORK
 ROOT = OUTPUT
 EX = STATE / 'v3_extract'
@@ -192,7 +192,7 @@ def raw_fp():
 def resolve_uncovered():
     raw = set(c['name'].lower() for c in json.loads((STATE / 'v3_raw_concepts.json').read_text(encoding='utf-8')))
     rp = STATE / 'v3_resolved.json'
-    res = json.loads(rp.read_text(encoding='utf-8')) if rp.exists() else {'concepts': []}
+    res = load_resolved(rp)
     members = set()
     for c in res.get('concepts', []):
         for m in c.get('members', []): members.add(m.lower())
@@ -361,7 +361,9 @@ def main():
                        f"v3_resolved.json (extend it; the {len(uncov)} new names are listed in\n"
                        f"refresh_cache/resolve_new_names.json). Reuse an existing category string when one\n"
                        f"fits, else coin a concise thematic category (aim for ~5-10 balanced categories\n"
-                       f"overall). Overwrite v3_resolved.json, then re-run refresh.py --with-resolve.")
+                       f"overall). Write v3_resolved.json as a JSON object with a top-level 'concepts'\n"
+                       f"key: {{\"concepts\": [{{\"canonical\":..., \"category\":..., \"members\":[...]}}, ...]}}\n"
+                       f"(NOT a bare array). Overwrite it, then re-run refresh.py --with-resolve.")
         elif '--skip-resolve' not in ARGS:
             print('  NOTE: concept set changed; run `refresh.py --with-resolve` for best clustering '
                   '(new concepts will be singletons otherwise).')

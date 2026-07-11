@@ -1,7 +1,7 @@
 import json, re, math, hashlib, pathlib, datetime, os, sys
 from collections import defaultdict, Counter
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from cogmap_paths import WORK, OUTPUT
+from cogmap_paths import WORK, OUTPUT, load_resolved
 STATE = WORK
 OUT = OUTPUT / 'knowledge-base-viz-data.json'
 
@@ -10,7 +10,7 @@ def sha(prefix, text): return prefix+'_'+hashlib.sha1(text.encode('utf-8','ignor
 master = json.loads((STATE/'v3_chunks_master.json').read_text(encoding='utf-8'))
 agg = json.loads((STATE/'v3_aggregate.json').read_text(encoding='utf-8'))
 _res_path = STATE/'v3_resolved.json'
-resolved = json.loads(_res_path.read_text(encoding='utf-8')) if _res_path.exists() else {'concepts': []}
+resolved = load_resolved(_res_path)
 sources = master['sources']
 chunks = master['chunks']
 chunks_by_id = {c['id']:c for c in chunks}

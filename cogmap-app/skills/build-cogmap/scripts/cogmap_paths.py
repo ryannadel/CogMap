@@ -82,3 +82,32 @@ if _project_local:
 
 for _d in (SOURCES, WORK, OUTPUT):
     _d.mkdir(parents=True, exist_ok=True)
+
+
+def load_resolved(path):
+    """Load v3_resolved.json tolerantly and return {'concepts': [...]}.
+
+    The resolve agent writes this file, sometimes as a bare JSON array of concept
+    records instead of the expected object with a 'concepts' key (especially on a
+    fresh corpus where the foreign-corpus reset deleted the demo file, leaving no
+    template to copy the wrapper from). Normalize both shapes so the pipeline never
+    breaks on that variation.
+    """
+    import json
+    p = pathlib.Path(path)
+    if not p.exists():
+        return {"concepts": []}
+    data = json.loads(p.read_text(encoding="utf-8"))
+    if isinstance(data, list):
+        return {"concepts": data}
+    if isinstance(data, dict):
+        if isinstance(data.get("concepts"), list):
+            return data
+        # Some agents nest it under another key or write a mapping of
+        # canonical -> record; recover a concepts list where possible.
+        for v in data.values():
+            if isinstance(v, list):
+                return {"concepts": v}
+        return {"concepts": []}
+    return {"concepts": []}
+

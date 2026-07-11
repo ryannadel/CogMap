@@ -170,8 +170,9 @@ single higher-reasoning pass:
 > Aim for ~5–10 balanced categories overall — enough to form meaningful Minard
 > lanes, not one lane per concept. Do not drop or duplicate any name; every new
 > name ends up in exactly one concept. Write the merged result back to
-> `v3_resolved.json` in the same schema. Prefer merging near-duplicates over
-> creating singletons.
+> `v3_resolved.json` as a JSON **object** with a top-level `concepts` key —
+> exactly `{"concepts": [{"canonical": ..., "category": ..., "members": [...]}, ...]}`
+> (NOT a bare array). Prefer merging near-duplicates over creating singletons.
 
 Then re-run `refresh.py --with-resolve`.
 
