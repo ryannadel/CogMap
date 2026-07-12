@@ -4,12 +4,19 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import importlib.util
 from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SKILL_DIR = REPO_ROOT / "cogmap-app" / "skills" / "build-cogmap"
 SCRIPTS_DIR = SKILL_DIR / "scripts"
+
+_publish_spec = importlib.util.spec_from_file_location(
+    "publish_github_pages", SCRIPTS_DIR / "publish_github_pages.py"
+)
+publish_github_pages = importlib.util.module_from_spec(_publish_spec)
+_publish_spec.loader.exec_module(publish_github_pages)
 
 
 def run_script(script, workspace, cwd=None, *args):
@@ -73,6 +80,61 @@ class CogMapPipelineTests(unittest.TestCase):
             self.assertGreater(data["metadata"]["counts"]["sources"], 0)
             self.assertGreater(data["metadata"]["counts"]["chunks"], 0)
             self.assertIn("CogMap", html.read_text(encoding="utf-8"))
+
+    def test_publish_remote_parsing_and_url(self):
+        cases = [
+            ("https://github.com/octo/demo.git", ("octo", "demo")),
+            ("git@github.com:octo/demo.git", ("octo", "demo")),
+            ("ssh://git@github.com/octo/demo.git", ("octo", "demo")),
+        ]
+        for remote, expected in cases:
+            with self.subTest(remote=remote):
+                self.assertEqual(publish_github_pages.parse_github_remote(remote), expected)
+        self.assertEqual(publish_github_pages.pages_url("octo", "demo"), "https://octo.github.io/demo/")
+        self.assertEqual(publish_github_pages.pages_url("octo", "octo.github.io"), "https://octo.github.io/")
+
+    def test_publish_github_pages_no_push_creates_branch_payload(self):
+        with tempfile.TemporaryDirectory() as td:
+            repo = Path(td) / "repo"
+            output = repo / "cogmap" / "output"
+            output.mkdir(parents=True)
+            (output / "knowledge-base-viz.html").write_text("<html>CogMap</html>", encoding="utf-8")
+            (output / "knowledge-base-viz-data.json").write_text('{"metadata": {}}', encoding="utf-8")
+
+            subprocess.run(["git", "init", "-q", str(repo)], check=True)
+            subprocess.run(["git", "config", "user.name", "Test User"], cwd=repo, check=True)
+            subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=repo, check=True)
+            (repo / "README.md").write_text("test\n", encoding="utf-8")
+            subprocess.run(["git", "add", "README.md"], cwd=repo, check=True)
+            subprocess.run(["git", "commit", "-q", "-m", "init"], cwd=repo, check=True)
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(SCRIPTS_DIR / "publish_github_pages.py"),
+                    "--repo-root",
+                    str(repo),
+                    "--output",
+                    str(output),
+                    "--no-push",
+                    "--no-enable-pages",
+                ],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+            )
+
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("Published locally to branch gh-pages", result.stdout)
+            html = subprocess.run(
+                ["git", "show", "gh-pages:index.html"],
+                cwd=repo,
+                check=True,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+            ).stdout
+            self.assertEqual(html, "<html>CogMap</html>")
 
 
 if __name__ == "__main__":

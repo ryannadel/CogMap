@@ -43,6 +43,7 @@ cogmap-app/                          Claude Code plugin root
    │  ├─ v3_aggregate.py             merge extractions → raw concepts
    │  ├─ v3_assemble.py              build the graph data JSON
    │  ├─ build_v2.py                 render the self-contained HTML
+   │  ├─ publish_github_pages.py      optional: publish output to GitHub Pages
    │  └─ extract_onex.py             optional: OneNote .onex → clean text (~66%)
    └─ assets/demo/                   bundled demo corpus + prebuilt artifacts
       ├─ sources/sample-notes.txt    synthetic demo corpus
@@ -86,6 +87,9 @@ CogMap is a **coding agent skill**, not a standalone app you run by hand:
    it writes them into `cogmap/sources/`, removes the demo corpus, and refreshes.
 4. Open `cogmap/output/knowledge-base-viz.html` when the agent reports completion
    (the agent prints the exact workspace path on every run).
+5. To share the result from a GitHub-backed repo, ask the agent to publish it to
+   GitHub Pages. The skill runs `refresh.py --publish-github-pages`, updates the
+   `gh-pages` branch with `index.html`, and prints the Pages URL.
 
 `refresh.py` diffs the notes, re-extracts **only the chunks that changed**,
 re-clusters **only new concepts**, re-synthesizes insights **only if the graph
