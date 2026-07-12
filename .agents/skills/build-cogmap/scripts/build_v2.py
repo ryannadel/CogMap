@@ -66,7 +66,7 @@ main{display:grid;grid-template-columns:1fr 380px;height:calc(100vh - 59px)}
 h2.section{font-size:15px;margin:0 0 4px}
 .sub{color:var(--cp-text-muted);font-size:12.5px;margin:0 0 16px;max-width:78ch}
 /* flow map */
-#flowWrap{background:var(--map-bg);border:1px solid var(--cp-border);border-radius:16px;padding:6px 6px 0;position:relative;overflow:hidden}
+#flowWrap{background:var(--map-bg);border:1px solid var(--cp-border);border-radius:16px;padding:6px 6px 0;position:relative;overflow:auto}
 .ribbon{cursor:pointer;transition:opacity .12s}
 .ribbon.dim{opacity:.12}
 .rlabel{font-size:12px;font-weight:700;paint-order:stroke;stroke:var(--map-bg);stroke-width:3px;pointer-events:none}
@@ -78,7 +78,7 @@ h2.section{font-size:15px;margin:0 0 4px}
 .evt:hover circle{stroke-width:2.4px}
 .axis-tick text{fill:var(--cp-text-muted);font-size:10px}
 .axis-tick line{stroke:var(--cp-border-strong);opacity:.5}
-.anchor-lbl{fill:var(--cp-text);font-size:10px;font-weight:600}
+.anchor-lbl{fill:var(--cp-text);font-size:10px;font-weight:600;paint-order:stroke;stroke:var(--map-bg);stroke-width:3px}
 .anchor-line{stroke:var(--cp-border-strong);stroke-dasharray:2 3;opacity:.55}
 .legend{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px}
 .legend .li{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--cp-text-muted);cursor:pointer;padding:3px 7px;border-radius:6px;border:1px solid transparent}
@@ -251,6 +251,13 @@ function openFullNote(chunkId){
 function closeNote(){document.getElementById('noteModal').classList.remove('open');}
 function statusBadge(st){const m={Observation:'b-obs',Decision:'b-dec',Prediction:'b-pred',Tension:'b-ten',Question:'b-que'};return `<span class="badge ${m[st]||'b-obs'}">${st}</span>`;}
 function posPct(f){return Math.round((f||0)*100)+'%';}
+function textWidthEstimate(s){
+  return Array.from(s||'').reduce((w,ch)=>w+(ch===' '?3.7:/[A-Z0-9&]/.test(ch)?7.4:6.3),0);
+}
+function ellipsize(s,maxChars){
+  s=s||'';
+  return s.length>maxChars ? s.slice(0,Math.max(1,maxChars-1)).trimEnd()+'\u2026' : s;
+}
 function inspectConcept(c){
   const color=CATCOLOR[c.category];
   const chip=o=>`<span class="rel" data-cid="${o.id}">${esc(o.label)}</span>`;
@@ -344,8 +351,10 @@ function renderFlow(){
   const series=buildSeries();
   series.sort((a,b)=>b.total-a.total);
   const nL=series.length;
-  const W=Math.max(820,stage.clientWidth-44);
-  const m={t:34,r:24,b:14,l:180};
+  const laneLabels=series.map(s=>s.label).concat(['evidence density']);
+  const leftGutter=Math.ceil(Math.min(320,Math.max(210,Math.max(...laneLabels.map(textWidthEstimate))+28)));
+  const m={t:86,r:32,b:18,l:leftGutter};
+  const W=Math.max(m.l+620+m.r,stage.clientWidth-44);
   const laneH=Math.max(52,Math.min(74,Math.floor(420/Math.max(1,nL))+34));
   const bandH=64, bandGap=18;
   const plotW=W-m.l-m.r;
@@ -357,14 +366,22 @@ function renderFlow(){
   const half=v=>Math.sqrt(v/gmax)*(laneH*0.40);   // sqrt keeps thin lanes visible
   let svg='';
   // date anchors (vertical guide lines + top labels)
-  (DATA.metadata.date_anchors||[]).forEach(a=>{
+  const anchorRows=[-Infinity,-Infinity,-Infinity];
+  (DATA.metadata.date_anchors||[]).slice().sort((a,b)=>a.pos-b.pos).forEach(a=>{
     const ax=x(a.pos);
+    const label=new Date(a.date).toLocaleDateString(undefined,{month:'short',day:'numeric'});
+    const lw=Math.max(42,textWidthEstimate(label)+12);
+    let row=anchorRows.findIndex(end=>ax-lw/2>end+6);
+    if(row<0) row=anchorRows.indexOf(Math.min(...anchorRows));
+    anchorRows[row]=ax+lw/2;
+    const labelY=36+row*14;
     svg+=`<line class="anchor-line" x1="${ax.toFixed(1)}" y1="${m.t-6}" x2="${ax.toFixed(1)}" y2="${m.t+nL*laneH}"/>
-      <text class="anchor-lbl" x="${ax.toFixed(1)}" y="${m.t-10}" text-anchor="middle">${new Date(a.date).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</text>`;
+      <text class="anchor-lbl" x="${ax.toFixed(1)}" y="${labelY}" text-anchor="middle">${label}</text>`;
   });
   const lanes=[], allLabels=[], allEvents=[];
   series.forEach((s,k)=>{
     const cy=m.t+k*laneH+laneH/2;
+    const laneTop=m.t+k*laneH, laneBot=laneTop+laneH;
     const before=s.first_pos*(NP-1);
     const top=[],bot=[];
     for(let i=0;i<NP;i++){
@@ -375,7 +392,8 @@ function renderFlow(){
     const d=smoothPath(top)+' L'+bot.slice().reverse().map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' L')+' Z';
     lanes.push({key:s.key,label:s.label,d,color:s.color,cy,total:s.total,tops:s.tops,cid:s.cid,drill:s.drill,first_pos:s.first_pos});
     // left lane label
-    allLabels.push(`<text x="${m.l-14}" y="${cy-2}" text-anchor="end" class="lane-name" fill="var(--cp-text)">${esc(s.label)}</text>
+    const laneLabel=ellipsize(s.label,Math.floor((m.l-24)/6.6));
+    allLabels.push(`<text x="${m.l-14}" y="${cy-2}" text-anchor="end" class="lane-name" fill="var(--cp-text)"><title>${esc(s.label)}</title>${esc(laneLabel)}</text>
       <text x="${m.l-14}" y="${cy+13}" text-anchor="end" class="lane-sub" fill="var(--cp-text-muted)">${s.total} mentions</text>`);
     // concept branch-tick labels (Minard-style event labels) at peaks
     if(!focusCat){
@@ -383,10 +401,11 @@ function renderFlow(){
         .map(c=>({c,pi:_peak(c.timeline)})).sort((a,b)=>a.pi-b.pi);
       tops.forEach((o,idx)=>{
         const px=xi(o.pi), up=idx%2===0?-1:1;
-        const ty=cy+up*(half(o.c.timeline[o.pi])+13);
+        const rawTy=cy+up*(half(o.c.timeline[o.pi])+13);
+        const ty=up<0?Math.max(laneTop+17,rawTy):Math.min(laneBot-17,rawTy);
         allLabels.push(`<g class="tick" data-cid="${o.c.id}"><line x1="${px.toFixed(1)}" y1="${cy.toFixed(1)}" x2="${px.toFixed(1)}" y2="${ty.toFixed(1)}" class="tick-lead"/>
           <circle cx="${px.toFixed(1)}" cy="${cy.toFixed(1)}" r="2.4" fill="${s.color}"/>
-          <text x="${px.toFixed(1)}" y="${(ty+(up<0?-2:9)).toFixed(1)}" text-anchor="middle" class="tick-lbl" fill="var(--cp-text-muted)">${esc(o.c.label)}</text></g>`);
+          <text x="${px.toFixed(1)}" y="${(ty+(up<0?-2:9)).toFixed(1)}" text-anchor="middle" class="tick-lbl" fill="var(--cp-text-muted)">${esc(ellipsize(o.c.label,22))}</text></g>`);
       });
     }
     // events (emerging, tension)
@@ -418,8 +437,8 @@ function renderFlow(){
   document.getElementById('view-flow').innerHTML=
     `${head}
      <div id="flowWrap"><svg width="${W}" height="${H}" id="flowSvg">
-       <text x="${m.l}" y="14" class="axis-tick" fill="var(--cp-text-muted)" style="font-size:10px">\u25b6 start of notebook</text>
-       <text x="${W-m.r}" y="14" text-anchor="end" class="axis-tick" fill="var(--cp-text-muted)" style="font-size:10px">most recent \u25b6</text>
+       <text x="${m.l}" y="18" class="axis-tick" fill="var(--cp-text-muted)" style="font-size:10px">\u25b6 start of notebook</text>
+       <text x="${W-m.r}" y="18" text-anchor="end" class="axis-tick" fill="var(--cp-text-muted)" style="font-size:10px">most recent \u25b6</text>
        ${svg}${laneBands}${allLabels.join('')}${allEvents.join('')}${band}</svg></div>
      <div class="legend">${legend}</div>`;
   const back=document.getElementById('backBtn'); if(back) back.onclick=()=>{focusCat=null;renderFlow();};
