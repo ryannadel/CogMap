@@ -16,12 +16,6 @@ The goal is to make accumulated knowledge navigable for both people and agents:
 map the concepts, trace relationships across sources, surface conflicts and gaps,
 notice drift or convergence, and decide where to focus next.
 
-## Status
-
-CogMap is currently an early public-beta project. The bundled demo renders from a
-fresh checkout, and the Markdown/text pipeline has automated smoke coverage. The
-semantic extraction, resolution, and synthesis stages are intentionally performed
-by your coding agent rather than by a hosted API.
 
 ## Why Minard?
 
