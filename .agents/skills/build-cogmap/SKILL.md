@@ -117,6 +117,12 @@ Flags:
 - `--from-onex` — best-effort re-extract `.onex` → clean text first (~66%).
 - `--skip-resolve`, `--skip-synth` — force-skip those gates.
 - `--no-open` — don't auto-open the finished HTML (also via `COGMAP_NO_OPEN=1`).
+- `--publish-github-pages` — after a successful build, publish the visualization
+  to a `gh-pages` branch and configure GitHub Pages when `gh` is authenticated.
+  Optional controls: `--publish-remote <name>` (default `origin`),
+  `--publish-branch <name>` (default `gh-pages`), `--publish-path <path>` for a
+  subdirectory, `--publish-no-push` for a local dry run, and
+  `--publish-no-enable-pages` to skip Pages API configuration.
 
 **Default recommendation:** `--with-resolve --with-synth` so a real content change
 yields fully-merged concepts and fresh insights. Read `action.json` after every
@@ -201,6 +207,13 @@ finished `output/knowledge-base-viz.html` is **auto-opened in the default browse
 (disable with `--no-open` or `COGMAP_NO_OPEN=1`). If it was already open, tell the
 user to **hard-refresh the browser (Ctrl+Shift+R)** — for large corpora the
 embedded page can be 1 MB+ and can't be reloaded from the agent side.
+
+If the user asks to share or publish the map publicly, re-run the final refresh
+with `--publish-github-pages` from a GitHub-backed repository. The publisher copies
+`knowledge-base-viz.html` to `index.html` on the Pages branch, includes the data
+JSON and a small manifest, pushes the branch, and prints the Pages URL when it can
+parse the GitHub remote. If automatic Pages enablement fails, report the printed
+warning and the branch it pushed so the user can enable Pages manually.
 
 ## Notes
 

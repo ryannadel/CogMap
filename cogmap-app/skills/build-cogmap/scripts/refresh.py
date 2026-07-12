@@ -17,6 +17,8 @@ Flags:
   --with-synth    re-run insight synthesis when the graph changed
   --skip-resolve  reuse existing resolution even if stale (new concepts -> singletons)
   --skip-synth    reuse existing insights even if stale
+  --publish-github-pages
+                  publish the finished HTML to a GitHub Pages branch
 """
 import json, re, hashlib, pathlib, subprocess, sys, os, time, shutil
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
@@ -33,6 +35,18 @@ DATA = ROOT / 'knowledge-base-viz-data.json'
 BUDGET = 26000
 PY = sys.executable
 ARGS = set(sys.argv[1:])
+
+
+def arg_value(name, default):
+    flag = f'--{name}'
+    prefix = flag + '='
+    argv = sys.argv[1:]
+    for i, value in enumerate(argv):
+        if value == flag and i + 1 < len(argv):
+            return argv[i + 1]
+        if value.startswith(prefix):
+            return value[len(prefix):]
+    return default
 
 def sha1s(s): return hashlib.sha1(s.encode('utf-8', 'ignore')).hexdigest()
 
@@ -96,6 +110,28 @@ def open_result(html):
             print('Opened {} in your browser.'.format(html.name))
         except Exception:
             print('Open it manually: {}'.format(html))
+
+
+def publish_github_pages():
+    cmd = [PY, str(PIPELINE / 'publish_github_pages.py'),
+           '--output', str(OUTPUT),
+           '--repo-root', str(pathlib.Path.cwd()),
+           '--remote', arg_value('publish-remote', 'origin'),
+           '--branch', arg_value('publish-branch', 'gh-pages'),
+           '--site-path', arg_value('publish-path', '.')]
+    if '--publish-no-push' in ARGS:
+        cmd.append('--no-push')
+    if '--publish-no-enable-pages' in ARGS:
+        cmd.append('--no-enable-pages')
+    env = dict(os.environ); env['PYTHONIOENCODING'] = 'utf-8'
+    r = subprocess.run(cmd, env=env, capture_output=True, text=True, encoding='utf-8')
+    if r.stdout.strip():
+        print(r.stdout.strip())
+    if r.returncode != 0:
+        if r.stderr.strip():
+            print(r.stderr.strip())
+        print('--- publish_github_pages.py FAILED ---')
+        sys.exit(r.returncode)
 
 
 def load_state():
@@ -403,6 +439,9 @@ def main():
     save_state(state)
     print('\nDONE. chunks={} tracked-extracted={}'.format(len(current), len(state['extracted_ids'])))
     print('Hard-refresh the browser (Ctrl+Shift+R) to see the update.')
+    if '--publish-github-pages' in ARGS:
+        print('publish: GitHub Pages...')
+        publish_github_pages()
     open_result(OUTPUT / 'knowledge-base-viz.html')
 
 if __name__ == '__main__':

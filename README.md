@@ -57,6 +57,7 @@ evolving landscape of thought.
 - Rebuilds incrementally, re-processing only changed chunks where possible.
 - Ships with a GitHub Copilot / Claude Code skill for agent-assisted refreshes.
 - Outputs a portable HTML artifact with embedded data and no server requirement.
+- Can publish the generated artifact to GitHub Pages for easy sharing.
 
 ## See it in action
 
@@ -111,6 +112,11 @@ When extraction, resolution, or synthesis work is needed, the skill pauses the
 pipeline, gives the coding agent structured actions to perform, and then resumes.
 That agent-in-the-loop loop is what lets CogMap rebuild without requiring a
 separate LLM API key.
+
+To share the finished map from a GitHub-backed repository, ask the agent to
+publish it to GitHub Pages. The skill runs `refresh.py --publish-github-pages`,
+copies the visualization to `index.html` on a `gh-pages` branch, pushes it, and
+prints the Pages URL.
 
 ## Installation paths
 
