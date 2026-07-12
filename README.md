@@ -12,6 +12,13 @@ concepts, claims, relationships, tensions, gaps, and trends from notes, then
 renders them as a self-contained, source-traceable visualization you can open in
 any browser.
 
+The visualization uses Minard-style flows to make that external memory legible:
+source notes feed into concepts, concepts branch into themes and questions, and
+related threads converge into synthesis points. Thicker paths represent heavily
+developed ideas, thinner paths show weakly supported concepts, branches reveal
+divergence, convergence points show synthesis, and fading paths mark stale or
+unresolved knowledge.
+
 The goal is to make accumulated knowledge navigable for both people and agents:
 map the concepts, trace relationships across sources, surface conflicts and gaps,
 notice drift or convergence, and decide where to focus next.
@@ -20,27 +27,19 @@ notice drift or convergence, and decide where to focus next.
 ## Why Minard?
 
 Charles Joseph Minard's 1869 map of Napoleon's Russian campaign is one of the
-classic examples of information design because it compresses several dimensions
-into a single readable story: geography, direction of movement, army size,
-temperature, and time. The power of the graphic is not just that it shows data,
-but that it shows movement, magnitude, direction, change, context, and consequence
-together. In Minard's chart, the thickness of a flow represents the number of
-surviving troops.
+classic examples of information design because it compresses many dimensions into
+one readable story: geography, direction of movement, army size, temperature, and
+time. Its power is not just that it shows data, but that it shows movement,
+magnitude, direction, change, context, and consequence together. In Minard's
+chart, the thickness of the flow represents the number of surviving troops as the
+campaign advances and retreats.
 
-CogMap borrows that visual language for knowledge work. A knowledge base has
-flows too:
-
-- ideas flowing from source notes into synthesized concepts
-- concepts branching into themes, decisions, questions, and open gaps
-- attention moving across topics over time
-- stronger and weaker connections between areas of knowledge
-- accumulation, loss, drift, and convergence of understanding
-
-In a CogMap, thicker paths represent heavily developed ideas, thinner paths show
-weakly supported concepts, branches reveal divergent themes, convergence points
-show synthesis, and fading paths mark stale or unresolved knowledge. The result
-is a body of notes that feels less like a pile of documents and more like an
-evolving landscape of thought.
+CogMap borrows that historical visual language for knowledge work. A knowledge
+base also has movement, magnitude, direction, and consequence: ideas emerge from
+sources, gather support, split into competing interpretations, reconnect through
+synthesis, or weaken when they remain unresolved. Minard's format is useful here
+because it makes change legible without flattening the story into a static list
+or dashboard.
 
 ## What it does
 
