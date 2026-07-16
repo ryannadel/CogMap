@@ -71,11 +71,13 @@ The Python orchestrator handles file discovery, chunking, caching, aggregation,
 graph assembly, and HTML rendering. When a semantic step is needed, it emits a
 structured action file and lets the host coding agent do the LLM work.
 
-For large corpora, extraction can fan out across multiple sub-agents — one per
-batch of changed chunks — so only the changed parts of the knowledge base are
-re-read. Separate higher-reasoning passes then handle concept resolution and
-synthesis. In other words, CogMap uses agents as temporary cognitive workers,
-while the pipeline remains the durable system of record.
+For large corpora, extraction is adaptively sized toward roughly 8–10 batches and
+can fan out across at most eight sub-agents at once, so only changed parts of the
+knowledge base are re-read. Valid partial outputs survive retries; missing or
+invalid batches are re-run with machine-readable diagnostics before ingestion.
+Separate higher-reasoning passes then handle concept resolution and synthesis
+sequentially. CogMap uses agents as temporary cognitive workers while the pipeline
+remains the durable system of record.
 
 ## Quick start
 

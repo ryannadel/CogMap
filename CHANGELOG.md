@@ -24,3 +24,6 @@ and this project uses semantic versioning for public releases.
 
 - Improved the public README with clearer prerequisites, demo guidance, install
   paths, and release-readiness notes.
+- Made extraction batching adaptive for large corpora, added bounded parallel
+  orchestration guidance, strict pre-ingestion validation, resumable partial
+  batches, and idempotent batch ingestion.

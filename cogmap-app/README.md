@@ -99,9 +99,12 @@ until exit `0`. See `skills/build-cogmap/SKILL.md` for the full loop and the thr
 agent prompt templates.
 
 Under the hood, CogMap uses agents as temporary cognitive workers while the
-Python pipeline remains the durable system of record. Extraction can fan out
-across multiple sub-agents — one per changed batch — while separate
-higher-reasoning passes handle concept resolution and synthesis.
+Python pipeline remains the durable system of record. Large extraction deltas are
+adaptively sized toward roughly 8–10 batches and can fan out across at most eight
+sub-agents at once. `action.json` lists only missing or invalid batches, retains
+valid outputs across resumes, and provides validation diagnostics. Separate
+higher-reasoning passes handle concept resolution and synthesis sequentially after
+all extraction outputs validate.
 
 > **`.onex` note:** direct OneNote `.onex` re-extraction recovers only ~66% of
 > prose. For full fidelity, supply a clean `.md`/`.txt` export instead. Ask the
@@ -154,6 +157,11 @@ python cogmap-app/tools/sync_skill.py --check   # CI/pre-commit drift check
   chunks are re-extracted.
 - **Valid-ID filtering** — `v3_aggregate.py` keeps only extractions whose chunk
   IDs still exist, so stale extractions for edited/removed notes are auto-dropped.
+- **Validated resumability** — extraction outputs must pass UTF-8, JSON, schema,
+  enum, reference, and batch-provenance checks before ingestion; valid partial
+  results are retained while only missing or invalid batches are re-run.
+- **Idempotent ingestion** — deterministic batch IDs make retries replace the same
+  extraction archive rather than duplicating evidence or edge weights.
 - **Foreign-corpus reset** — the first time you swap in your own notes, the demo's
   resolved/insight artifacts are cleared so your corpus doesn't inherit demo
   categories.

@@ -2,6 +2,7 @@ import json, re, hashlib, pathlib, datetime, os, sys
 from collections import defaultdict
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from cogmap_paths import SOURCES, WORK
+from extraction_batches import MAX_BATCH_CHARS, batch_items
 STATE = WORK
 BATCH_DIR = STATE / 'v3_batches'
 BATCH_DIR.mkdir(exist_ok=True)
@@ -19,6 +20,20 @@ def clean_text(s):
     s = s.replace('\u2011', '-')
     s = re.sub(r'\s+', ' ', s).strip()
     return s
+
+def bounded_text_parts(text):
+    """Split only pathological long chunks, preferring a nearby word boundary."""
+    parts=[]; offset=0
+    while len(text)-offset > MAX_BATCH_CHARS:
+        end=offset+MAX_BATCH_CHARS
+        split=text.rfind(' ',offset,end+1)
+        if split<=offset: split=end
+        parts.append((text[offset:split].strip(),offset))
+        offset=split
+        while offset<len(text) and text[offset].isspace(): offset+=1
+    tail=text[offset:].strip()
+    if tail: parts.append((tail,offset))
+    return parts
 
 def is_readable(s):
     if len(s) < 30: return False
@@ -76,7 +91,10 @@ def chunks_from_markdown(path):
         if line.startswith('#') or (not line.strip() and buf):
             if buf:
                 raw='\n'.join(buf).strip()
-                if raw: out.append({'heading':heading,'text':clean_text(raw),'start':start,'end':start+len(raw),'line':None})
+                if raw:
+                    cleaned=clean_text(raw)
+                    for part,offset in bounded_text_parts(cleaned):
+                        out.append({'heading':heading,'text':part,'start':start+offset,'end':start+offset+len(part),'line':None})
                 buf=[]
             if line.startswith('#'): heading=clean_text(line.lstrip('#').strip()); start=pos
         elif line.strip():
@@ -89,8 +107,9 @@ def _emit(out, raw, heading, line_no):
     parts = re.split(r'(?<=[.!?])\s+(?=[A-Z])', raw) if len(raw) > 900 else [raw]
     for part in parts:
         part = clean_text(part)
-        if is_readable(part):
-            out.append({'heading': heading, 'text': part, 'start': 0, 'end': len(part), 'line': line_no})
+        for bounded,offset in bounded_text_parts(part):
+            if is_readable(bounded):
+                out.append({'heading': heading, 'text': bounded, 'start': offset, 'end': offset+len(bounded), 'line': line_no})
 
 def chunks_from_text(path):
     """Format-agnostic plain-text notes. Auto-detects prose (blank-line-separated
@@ -193,19 +212,19 @@ else:
 master={'sources':[{k:s[k] for k in ('id','title','path','kind')} for s in sources],'chunks':chunks}
 (STATE/'v3_chunks_master.json').write_text(json.dumps(master,ensure_ascii=False),encoding='utf-8')
 
-# batch by cumulative char budget, keep reading order, don't split sources across a batch boundary awkwardly
-BUDGET=26000
-batches=[]; cur=[]; cur_len=0
-for c in sorted(chunks,key=lambda c:c['order']):
-    item={'chunk_id':c['id'],'order':c['order'],'source':c['source_id'],'heading':c['heading'],'date':c.get('date'),'date_exact':c.get('date_exact',False),'text':c['text']}
-    if cur and cur_len+len(c['text'])>BUDGET:
-        batches.append(cur); cur=[]; cur_len=0
-    cur.append(item); cur_len+=len(c['text'])
-if cur: batches.append(cur)
+# Keep the legacy prep batches useful while sharing the refresh orchestrator's
+# adaptive sizing policy.
+items=[
+    {'chunk_id':c['id'],'order':c['order'],'source':c['source_id'],'heading':c['heading'],'date':c.get('date'),'date_exact':c.get('date_exact',False),'text':c['text']}
+    for c in sorted(chunks,key=lambda c:c['order'])
+]
+batches,batch_guidance=batch_items(items)
 
+for old in BATCH_DIR.glob('batch_*.json'): old.unlink()
 for i,b in enumerate(batches):
     (BATCH_DIR/f'batch_{i:02d}.json').write_text(json.dumps(b,ensure_ascii=False,indent=1),encoding='utf-8')
 
 print('chunks',len(chunks),'batches',len(batches))
+print('adaptive batch char budget',batch_guidance['selected_batch_chars'])
 print('batch char sizes',[sum(len(x['text']) for x in b) for b in batches])
 print('exact-dated chunks',sum(1 for c in chunks if c.get('date_exact')))

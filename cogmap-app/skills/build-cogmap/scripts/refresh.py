@@ -23,6 +23,12 @@ Flags:
 import json, re, hashlib, pathlib, subprocess, sys, os, time, shutil
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from cogmap_paths import WORK, OUTPUT, PIPELINE, load_resolved
+from extraction_batches import (
+    MAX_EXTRACTION_CONCURRENCY,
+    batch_items,
+    extraction_batch_id,
+    load_extraction_output,
+)
 STATE = WORK
 ROOT = OUTPUT
 EX = STATE / 'v3_extract'
@@ -32,7 +38,6 @@ EX.mkdir(parents=True, exist_ok=True)
 CACHE.mkdir(parents=True, exist_ok=True)
 STATEF = CACHE / 'state.json'
 DATA = ROOT / 'knowledge-base-viz-data.json'
-BUDGET = 26000
 PY = sys.executable
 ARGS = set(sys.argv[1:])
 
@@ -175,41 +180,102 @@ def write_delta_batches(master, miss_ids):
     DELTA.mkdir()
     by_id = {c['id']: c for c in master['chunks']}
     miss = sorted(miss_ids, key=lambda i: by_id[i]['order'])
-    batches = []; cur = []; cur_len = 0
+    items = []
     for i in miss:
         c = by_id[i]
-        item = {'chunk_id': c['id'], 'order': c['order'], 'source': c['source_id'],
-                'heading': c['heading'], 'date': c.get('date'), 'date_exact': c.get('date_exact', False),
-                'text': c['text']}
-        if cur and cur_len + len(c['text']) > BUDGET:
-            batches.append(cur); cur = []; cur_len = 0
-        cur.append(item); cur_len += len(c['text'])
-    if cur: batches.append(cur)
-    man = {'batches': []}
+        items.append({'chunk_id': c['id'], 'order': c['order'], 'source': c['source_id'],
+                      'heading': c['heading'], 'date': c.get('date'),
+                      'date_exact': c.get('date_exact', False), 'text': c['text']})
+    batches, batching = batch_items(items)
+    man = {'version': 2, 'batching': batching, 'batches': []}
     for n, b in enumerate(batches):
         inp = DELTA / f'pending_{n:02d}.json'
         inp.write_text(json.dumps(b, ensure_ascii=False, indent=1), encoding='utf-8')
-        man['batches'].append({'input': str(inp), 'output': str(DELTA / f'extract_{n:02d}.json'),
-                               'chunk_ids': [x['chunk_id'] for x in b]})
+        chunk_ids = [x['chunk_id'] for x in b]
+        man['batches'].append({
+            'batch_id': extraction_batch_id(chunk_ids),
+            'input': str(inp),
+            'output': str(DELTA / f'extract_{n:02d}.json'),
+            'chunk_ids': chunk_ids,
+            'char_count': sum(len(x['text']) for x in b),
+        })
     (DELTA / 'manifest.json').write_text(json.dumps(man, ensure_ascii=False, indent=1), encoding='utf-8')
     return man
 
-def outputs_ready(man):
+def inspect_outputs(man):
+    completed = []
+    pending = []
     for b in man['batches']:
-        p = pathlib.Path(b['output'])
-        if not p.exists(): return False
-        try: json.loads(p.read_text(encoding='utf-8'))
-        except Exception: return False
-    return True
+        _, errors = load_extraction_output(b['output'], b['chunk_ids'])
+        item = dict(b)
+        item['batch_id'] = b.get('batch_id') or extraction_batch_id(b['chunk_ids'])
+        if errors:
+            item['status'] = 'missing' if not pathlib.Path(b['output']).exists() else 'invalid'
+            item['diagnostics'] = errors
+            pending.append(item)
+        else:
+            item['status'] = 'valid'
+            completed.append(item)
+    return completed, pending
+
+
+def extraction_action_payload(man, completed, pending):
+    return {
+        'manifest': str(DELTA / 'manifest.json'),
+        'batches': pending,
+        'completed_batch_ids': [b['batch_id'] for b in completed],
+        'progress': {
+            'total': len(man['batches']),
+            'valid': len(completed),
+            'pending': len(pending),
+        },
+        'batching': man.get('batching', {}),
+        'orchestration': {
+            'strategy': 'bounded_parallel',
+            'max_concurrency': min(MAX_EXTRACTION_CONCURRENCY, len(pending)),
+            'dispatch_only_listed_batches': True,
+            'wait_for_all_before_resume': True,
+            'subsequent_stages': ['resolve', 'synth'],
+            'subsequent_stages_parallel': False,
+        },
+        'validation': {
+            'automatic_before_ingestion': True,
+            'invalid_outputs_remain_pending': True,
+        },
+    }
 
 def ingest(man, state):
-    stamp = str(int(time.time()))
+    validated = []
     ids = set()
-    for i, b in enumerate(man['batches']):
-        out = json.loads(pathlib.Path(b['output']).read_text(encoding='utf-8'))
-        (EX / f'extract_delta_{stamp}_{i:02d}.json').write_text(
-            json.dumps(out, ensure_ascii=False), encoding='utf-8')
+    for b in man['batches']:
+        out, errors = load_extraction_output(b['output'], b['chunk_ids'])
+        if errors:
+            raise ValueError(f"cannot ingest invalid extraction {b['output']}: {'; '.join(errors)}")
+        validated.append((b, out))
         ids.update(b['chunk_ids'])
+    if any('batch_id' not in b for b in man['batches']):
+        # A pre-v2 crash could leave timestamp archives beside its still-live
+        # manifest. Remove exact output matches before migrating to deterministic
+        # names so the aggregate cannot count the same extraction twice.
+        output_fingerprints = {
+            json.dumps(out, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
+            for _, out in validated
+        }
+        for legacy in EX.glob('extract_delta_*_*.json'):
+            try:
+                legacy_data = json.loads(legacy.read_text(encoding='utf-8'))
+            except (OSError, UnicodeError, json.JSONDecodeError):
+                continue
+            fingerprint = json.dumps(
+                legacy_data, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
+            if fingerprint in output_fingerprints:
+                legacy.unlink()
+    for b, out in validated:
+        batch_id = b.get('batch_id') or extraction_batch_id(b['chunk_ids'])
+        target = EX / f'extract_delta_{batch_id}.json'
+        temp = target.with_suffix('.json.tmp')
+        temp.write_text(json.dumps(out, ensure_ascii=False), encoding='utf-8')
+        temp.replace(target)
     state['extracted_ids'] = sorted(set(state.get('extracted_ids', [])) | ids)
     # Delete the manifest FIRST as the completion marker: if the subsequent dir
     # cleanup is blocked (Windows/OneDrive lock), a surviving manifest must not
@@ -346,24 +412,26 @@ def main():
     man_path = DELTA / 'manifest.json'
     if man_path.exists():
         man = json.loads(man_path.read_text(encoding='utf-8'))
-        if outputs_ready(man):
+        completed, pending = inspect_outputs(man)
+        if not pending:
             n = ingest(man, state); save_state(state)
             print(f'ingested {n} newly extracted chunks')
         else:
-            done = sum(pathlib.Path(b['output']).exists() for b in man['batches'])
-            action('extract', {'manifest': str(man_path), 'batches': man['batches']},
-                   f"{done}/{len(man['batches'])} extraction batches done. Run an extraction agent for "
-                   f"each pending refresh_delta/pending_NN.json -> refresh_delta/extract_NN.json.")
+            action('extract', extraction_action_payload(man, completed, pending),
+                   f"{len(completed)}/{len(man['batches'])} extraction batches are valid. "
+                   f"Run only the {len(pending)} listed pending batch(es), up to "
+                   f"{min(MAX_EXTRACTION_CONCURRENCY, len(pending))} concurrently, then re-run once.")
     miss = sorted(cset - set(state['extracted_ids']))
     if miss:
         man = write_delta_batches(master, miss)
         nb = len(man['batches'])
         save_state(state)
-        action('extract', {'manifest': str(DELTA / 'manifest.json'), 'batches': man['batches']},
+        completed, pending = inspect_outputs(man)
+        action('extract', extraction_action_payload(man, completed, pending),
                f"{len(miss)} new/changed chunks -> {nb} extraction batch(es).\n"
-               f"For each refresh_delta/pending_NN.json, run a general-purpose agent that reads the batch\n"
-               f"(json.load), extracts concepts/claims/relations in the v3 schema, and writes\n"
-               f"refresh_delta/extract_NN.json. Then re-run refresh.py.")
+               f"Launch up to {min(MAX_EXTRACTION_CONCURRENCY, nb)} general-purpose extraction agents "
+               f"concurrently for the listed batches.\nEach agent must read its input with json.load "
+               f"and write the v3 extraction schema to its output. Wait for all, then re-run once.")
     save_state(state)
 
     # ---------- AGGREGATE ----------
@@ -379,6 +447,13 @@ def main():
     if state.get('resolve_fp') is None and have_resolved:
         state['resolve_fp'] = rfp  # seed baseline only when the resolution fits the corpus
     resolve_stale = (not have_resolved) or (rfp != state.get('resolve_fp'))
+    if (resolve_stale and '--with-synth' in ARGS
+            and '--with-resolve' not in ARGS and '--skip-resolve' not in ARGS):
+        print('ERROR: synthesis is blocked until stale resolution is handled. Re-run with '
+              '`--with-resolve --with-synth`, or explicitly choose `--skip-resolve '
+              '--with-synth` to synthesize over singleton fallback concepts.')
+        save_state(state)
+        sys.exit(2)
 
     # ---------- RESOLVE (gated) ----------
     if resolve_stale:
@@ -389,7 +464,8 @@ def main():
             else:
                 (CACHE).mkdir(exist_ok=True)
                 (CACHE / 'resolve_new_names.json').write_text(json.dumps(uncov, ensure_ascii=False, indent=1), encoding='utf-8')
-                action('resolve', {'raw_concepts': str(STATE / 'v3_raw_concepts.json'),
+                action('resolve', {'orchestration': {'strategy': 'sequential', 'after': 'extract'},
+                                   'raw_concepts': str(STATE / 'v3_raw_concepts.json'),
                                    'existing': str(STATE / 'v3_resolved.json'),
                                    'new_names': str(CACHE / 'resolve_new_names.json'), 'uncovered': len(uncov)},
                        f"{len(uncov)} concept name(s) are not yet clustered. Run an Opus resolver agent that\n"
@@ -425,7 +501,8 @@ def main():
             else:
                 build_synth_input()
                 state['synth_pending'] = gfp; state['synth_token'] = time.time(); save_state(state)
-                action('synth', {'synth_input': str(STATE / 'v3_synth_input.json'),
+                action('synth', {'orchestration': {'strategy': 'sequential', 'after': 'resolve'},
+                                 'synth_input': str(STATE / 'v3_synth_input.json'),
                                  'out': str(STATE / 'v3_insights.json')},
                        "Graph changed. Run an Opus synthesis agent over v3_synth_input.json to produce\n"
                        "v3_insights.json (polished insight narratives + cross-cutting synthesis cards,\n"
