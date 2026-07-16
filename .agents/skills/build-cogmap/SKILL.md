@@ -101,7 +101,8 @@ user-facing guide.
 - **exit 10** — an LLM stage is required. Details are in the workspace at
   `work/refresh_cache/action.json` (`{"action": "extract"|"resolve"|"synth", ...}`;
   all file paths inside are absolute). Handle the stage (see below), then **re-run
-  the same command**. Repeat until exit 0.
+  the same command**. For extraction, finish every listed pending batch and re-run
+  once; the pipeline validates all outputs before advancing. Repeat until exit 0.
 
 Run it (from the user's working dir; paths self-resolve):
 ```
@@ -113,7 +114,9 @@ Flags:
   canonical concepts (best quality). Without it, assemble uses a lossless singleton
   fallback (new concepts appear un-merged).
 - `--with-synth` — on graph change, refresh insight narratives + synthesis cards.
-  Without it, existing insights are reused.
+  Without it, existing insights are reused. If resolution is stale, this requires
+  `--with-resolve` or an explicit `--skip-resolve`; synthesis never runs ahead of
+  an unresolved resolution gate.
 - `--from-onex` — best-effort re-extract `.onex` → clean text first (~66%).
 - `--skip-resolve`, `--skip-synth` — force-skip those gates.
 - `--no-open` — don't auto-open the finished HTML (also via `COGMAP_NO_OPEN=1`).
@@ -130,19 +133,31 @@ exit-10, handle the stage, re-run. Never hand-edit pipeline outputs.
 
 ### Handling the LLM stages
 
-Each stage below can be run **by dispatched sub-agents** or **by you directly** —
-whatever your host tool supports. If your tool can fan out parallel sub-agents
-(e.g. one per extraction batch), do so for speed; otherwise process the batches
-sequentially yourself. Use a capable general model for extraction and a
-higher-reasoning setting for resolve/synth when available.
+Each stage below can be run **by dispatched sub-agents** or **by you directly**.
+Extraction is the only parallel stage. Follow `action.json.orchestration`: dispatch
+only the listed pending batches, run no more than `max_concurrency` at once, wait
+for every listed batch to finish, and then re-run `refresh.py` once. If more batches
+remain, use bounded waves rather than launching unbounded agents. Resolve and synth
+are single, sequential higher-reasoning passes and start only after extraction has
+fully validated.
 
 ---
 
 ## Stage 1 — Extraction (`action == "extract"`)
 
-`action.json` has `batches: [{input, output, chunk_ids}]`. For **each** batch,
-read its `input` file and write its `output` file (parallel sub-agents if
-supported, else sequential). Prompt / task (fill INPUT/OUTPUT):
+The pipeline adaptively sizes large deltas toward roughly 8–10 batches, bounded by
+safe character and chunk limits. `action.json` exposes the selected policy under
+`batching` and includes:
+
+- `batches`: **only missing or invalid batches** to run. Each has `input`,
+  `output`, `chunk_ids`, `batch_id`, `status`, and actionable `diagnostics`.
+- `completed_batch_ids`: valid outputs already retained; do not run them again.
+- `progress`: total, valid, and pending counts.
+- `orchestration.max_concurrency`: the safe parallel dispatch bound (at most 8).
+
+For each listed batch, read its `input` file and write its `output` file. Preserve
+the manifest and valid output files; never recreate the delta directory yourself.
+Prompt / task (fill INPUT/OUTPUT):
 
 > Read the JSON array at `INPUT` using `json.load` (do NOT use a view tool — it
 > truncates). Each element is a note chunk: `{chunk_id, order, source, heading,
@@ -159,7 +174,13 @@ supported, else sequential). Prompt / task (fill INPUT/OUTPUT):
 > Deduplicate names within the batch; use canonical noun-phrase names. Only
 > reference chunk_ids from this batch. Output valid UTF-8 JSON, nothing else.
 
-When all outputs exist, re-run `refresh.py` — it auto-ingests them.
+When all listed outputs are written, wait for all extraction agents and re-run
+`refresh.py` **once**. The pipeline decodes each output as UTF-8, parses JSON, and
+validates the exact top-level schema, required fields/types, enums, concept
+references, and batch-local chunk/evidence IDs. Valid completed outputs are skipped
+on subsequent runs. Invalid outputs remain pending in `action.json` with diagnostics
+and must be overwritten by re-running only those batches; they are never ingested
+or silently discarded.
 
 ## Stage 2 — Incremental resolve (`action == "resolve"`)
 
@@ -182,6 +203,9 @@ single higher-reasoning pass:
 
 Then re-run `refresh.py --with-resolve`.
 
+Resolution is sequential and is never dispatched until every extraction batch is
+valid and ingested.
+
 ## Stage 3 — Synthesis (`action == "synth"`)
 
 `action.json` has `synth_input` (`work/v3_synth_input.json`). Handle with a single
@@ -197,6 +221,9 @@ higher-reasoning pass:
 > grounded in the supplied graph.
 
 Then re-run `refresh.py --with-synth`.
+
+Synthesis is sequential after resolution; do not overlap it with extraction or
+resolution.
 
 ---
 
@@ -228,5 +255,7 @@ warning and the branch it pushed so the user can enable Pages manually.
 - Correctness mechanism: `v3_aggregate.py` filters extractions by the current
   chunk IDs, so stale extractions for edited/removed chunks are auto-dropped.
   Chunk IDs are content-only (position-independent), so mid-file edits don't cascade.
+- Extraction archives use deterministic batch IDs, so retrying ingestion replaces
+  the same archive instead of duplicating graph evidence or edge weights.
 - Engine scripts: `scripts/refresh.py` (orchestrator), `v3_prep.py`,
   `v3_aggregate.py`, `v3_assemble.py`, `build_v2.py`, `extract_onex.py`.
