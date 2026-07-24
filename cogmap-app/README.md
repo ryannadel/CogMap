@@ -91,6 +91,12 @@ CogMap is a **coding agent skill**, not a standalone app you run by hand:
    GitHub Pages. The skill runs `refresh.py --publish-github-pages`, updates the
    `gh-pages` branch with `index.html`, and prints the Pages URL.
 
+The generated map opens on a **knowledge review inbox**. It prioritizes
+contradictions, open questions, low-confidence concepts, and ideas that are emerging
+or rising. Each item links into the existing provenance inspector and can be marked
+reviewed, dismissed, or reopened. These decisions are stored locally in the browser
+using stable item IDs, so they survive regenerated maps for the same source corpus.
+
 `refresh.py` diffs the notes, re-extracts **only the chunks that changed**,
 re-clusters **only new concepts**, re-synthesizes insights **only if the graph
 moved**, then rebuilds the HTML. When an LLM stage is needed it writes the inputs,

@@ -49,6 +49,8 @@ header{display:flex;align-items:center;gap:16px;padding:14px 22px;border-bottom:
   cursor:pointer;font-size:13px;font-weight:600}
 .tab:hover{background:var(--cp-surface-soft);color:var(--cp-text)}
 .tab.active{background:var(--cp-accent-soft);color:var(--cp-accent);border-color:var(--cp-accent-soft)}
+.tab-count{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;margin-left:5px;padding:0 6px;
+  border-radius:999px;background:var(--cp-accent);color:var(--cp-accent-fg);font-size:10px}
 .spacer{flex:1}
 .search input{background:var(--cp-surface);border:1px solid var(--cp-border);color:var(--cp-text);
   border-radius:.625rem;padding:8px 12px;width:230px;font-size:13px}
@@ -91,6 +93,28 @@ h2.section{font-size:15px;margin:0 0 4px}
 .card .det{font-size:12.5px;color:var(--cp-text-muted)}
 .card .tag{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;color:var(--cp-text-soft)}
 .spark{display:block;margin-top:8px}
+/* review inbox */
+.review-summary{display:grid;grid-template-columns:repeat(4,minmax(110px,1fr));gap:10px;margin:0 0 14px}
+.review-stat{background:var(--cp-surface);border:1px solid var(--cp-border);border-radius:12px;padding:10px 12px}
+.review-stat b{display:block;font-size:19px;line-height:1.1}.review-stat span{color:var(--cp-text-muted);font-size:11px}
+.review-list{display:grid;gap:10px}
+.review-card{background:var(--cp-surface);border:1px solid var(--cp-border);border-left:4px solid var(--cp-border-strong);
+  border-radius:16px;padding:13px 14px;box-shadow:0 0 2px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.14)}
+.review-card.priority-urgent{border-left-color:var(--cp-danger)}.review-card.priority-high{border-left-color:var(--cp-warning)}
+.review-card.priority-medium{border-left-color:var(--cp-accent)}.review-card.priority-low{border-left-color:var(--cp-link)}
+.review-card.reviewed,.review-card.dismissed{opacity:.68}
+.review-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.review-title{font-weight:700;font-size:13.5px}.review-detail{font-size:12.5px;color:var(--cp-text-muted);margin:5px 0 9px}
+.review-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.review-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.review-action{border:1px solid var(--cp-border);border-radius:.625rem;background:var(--cp-surface);color:var(--cp-text);
+  cursor:pointer;font-size:11.5px;font-weight:600;padding:6px 10px}
+.review-action:hover{border-color:var(--cp-accent);color:var(--cp-accent)}
+.review-action.primary{background:var(--cp-accent);border-color:var(--cp-accent);color:var(--cp-accent-fg)}
+.review-new{color:var(--cp-accent);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.review-warning{border:1px solid var(--cp-warning);border-radius:12px;color:var(--cp-text-muted);font-size:12px;padding:9px 11px;margin-bottom:12px}
+@media(max-width:900px){main{grid-template-columns:1fr}.inspector{border-left:0;border-top:1px solid var(--cp-border)}
+  .review-summary{grid-template-columns:repeat(2,1fr)}header{flex-wrap:wrap}.tabs{order:3;width:100%;overflow:auto}}
 /* explorer */
 .row{display:flex;align-items:center;gap:12px;padding:9px 11px;border:1px solid var(--cp-border);border-radius:12px;
   background:var(--cp-surface);margin-bottom:8px;cursor:pointer}
@@ -143,7 +167,8 @@ h2.section{font-size:15px;margin:0 0 4px}
 <header>
   <div class="brand">CogMap<small>How your thinking evolved across the notebook — every claim traceable to source</small></div>
   <div class="tabs">
-    <button class="tab active" data-view="flow">Knowledge march</button>
+    <button class="tab active" data-view="review">Review <span class="tab-count" id="reviewTabCount">0</span></button>
+    <button class="tab" data-view="flow">Knowledge march</button>
     <button class="tab" data-view="insights">Insights</button>
     <button class="tab" data-view="explorer">Explorer</button>
     <button class="tab" data-view="sources">Sources</button>
@@ -153,12 +178,13 @@ h2.section{font-size:15px;margin:0 0 4px}
 </header>
 <main>
   <div class="stage">
-    <section class="view active" id="view-flow"></section>
+    <section class="view active" id="view-review"></section>
+    <section class="view" id="view-flow"></section>
     <section class="view" id="view-insights"></section>
     <section class="view" id="view-explorer"></section>
     <section class="view" id="view-sources"></section>
   </div>
-  <aside class="inspector" id="inspector"><div class="ins-empty">Select a stream, insight, or concept to see how it evolved and trace it back to the source.</div></aside>
+  <aside class="inspector" id="inspector"><div class="ins-empty">Review an item to inspect the underlying concept, claim, tension, and source evidence.</div></aside>
 </main>
 <div class="tooltip" id="tip"></div>
 <div class="note-modal" id="noteModal"><div class="note-card"><button class="note-close" id="noteClose">×</button><div class="note-meta" id="noteMeta"></div><div class="note-title" id="noteTitle"></div><div class="note-body" id="noteBody"></div></div></div>
@@ -310,6 +336,113 @@ function inspectContradiction(con){
 function bindRels(){document.querySelectorAll('#inspector [data-cid]').forEach(el=>el.onclick=()=>{const c=conceptById[el.getAttribute('data-cid')];if(c)inspectConcept(c);});
   document.querySelectorAll('#inspector [data-note]').forEach(el=>el.onclick=(e)=>{e.stopPropagation();openFullNote(el.getAttribute('data-note'));});}
 function openNode(id){if(conceptById[id])inspectConcept(conceptById[id]);else if(claimById[id])inspectClaim(claimById[id]);}
+
+/* ---------- KNOWLEDGE REVIEW INBOX ---------- */
+function reviewStorageKey(){
+  const seed=window.location.origin+'|'+window.location.pathname;
+  let h=5381;for(let i=0;i<seed.length;i++)h=((h<<5)+h)^seed.charCodeAt(i);
+  return 'cogmap-review-v1-'+(h>>>0).toString(36);
+}
+let reviewStorageAvailable=true;
+function loadReviewState(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(reviewStorageKey())||'null');
+    if(saved&&saved.statuses&&Array.isArray(saved.seen))return saved;
+  }catch(err){reviewStorageAvailable=false;}
+  return {statuses:{},seen:[]};
+}
+const reviewState=loadReviewState();
+function saveReviewState(){
+  try{localStorage.setItem(reviewStorageKey(),JSON.stringify(reviewState));reviewStorageAvailable=true;}
+  catch(err){reviewStorageAvailable=false;}
+}
+function buildReviewItems(){
+  const items=[];
+  DATA.contradictions.forEach(con=>items.push({
+    id:'tension:'+con.id,type:'Tension',priority:'urgent',title:con.summary||'Resolve a contradiction',
+    detail:con.a_label+' ↔ '+con.b_label,targetType:'contradiction',targetId:con.id,
+    provenance:con.provenance||[]
+  }));
+  DATA.claims.filter(c=>c.status==='Question').forEach(c=>items.push({
+    id:'question:'+c.id,type:'Open question',priority:'high',title:'An open question needs an answer',
+    detail:c.label,targetType:'claim',targetId:c.id,provenance:c.provenance||[]
+  }));
+  DATA.concepts.filter(c=>c.confidence<0.7).sort((a,b)=>a.confidence-b.confidence||b.salience-a.salience).forEach(c=>items.push({
+    id:'verify:'+c.id,type:'Verify extraction',priority:'medium',title:'Verify: '+c.label,
+    detail:(c.definition||'This concept has limited supporting evidence.')+' Confidence '+Math.round(c.confidence*100)+'%.',
+    targetType:'concept',targetId:c.id,provenance:c.provenance||[]
+  }));
+  DATA.insights.filter(i=>(i.type==='Emerging'||i.type==='Rising')&&i.node).forEach(i=>items.push({
+    id:'development:'+i.type+':'+i.node,type:i.type+' idea',priority:'low',title:i.title,
+    detail:i.detail,targetType:'concept',targetId:i.node,provenance:i.provenance||[]
+  }));
+  const seen=new Set();
+  return items.filter(i=>!seen.has(i.id)&&seen.add(i.id));
+}
+const REVIEW_ITEMS=buildReviewItems();
+const priorityRank={urgent:0,high:1,medium:2,low:3};
+REVIEW_ITEMS.sort((a,b)=>priorityRank[a.priority]-priorityRank[b.priority]||a.title.localeCompare(b.title));
+let reviewFilter='open';
+function reviewStatus(id){return reviewState.statuses[id]||'open';}
+function reviewCounts(){
+  return REVIEW_ITEMS.reduce((a,i)=>{a[reviewStatus(i.id)]++;return a;},{open:0,reviewed:0,dismissed:0});
+}
+function updateReviewTab(){
+  const count=document.getElementById('reviewTabCount');if(count)count.textContent=reviewCounts().open;
+}
+function inspectReviewItem(item){
+  if(item.targetType==='contradiction'){
+    const con=DATA.contradictions.find(c=>c.id===item.targetId);if(con)inspectContradiction(con);
+  }else if(item.targetType==='claim'&&claimById[item.targetId])inspectClaim(claimById[item.targetId]);
+  else if(conceptById[item.targetId])inspectConcept(conceptById[item.targetId]);
+  const inspector=document.getElementById('inspector');inspector.scrollTop=0;
+  if(window.matchMedia('(max-width:900px)').matches)inspector.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function setReviewStatus(id,status){
+  const stage=document.querySelector('.stage'),scrollTop=stage.scrollTop;
+  if(status==='open')delete reviewState.statuses[id];else reviewState.statuses[id]=status;
+  saveReviewState();renderReview();stage.scrollTop=scrollTop;
+}
+function renderReview(){
+  const counts=reviewCounts(),unseen=new Set(REVIEW_ITEMS.filter(i=>!reviewState.seen.includes(i.id)).map(i=>i.id));
+  const filters=[['open','Open',counts.open],['reviewed','Reviewed',counts.reviewed],['dismissed','Dismissed',counts.dismissed],['all','All',REVIEW_ITEMS.length]];
+  const list=REVIEW_ITEMS.filter(i=>reviewFilter==='all'||reviewStatus(i.id)===reviewFilter);
+  const cards=list.map(item=>{
+    const status=reviewStatus(item.id),p=item.provenance[0]||{},ch=chunkById[p.chunk_id]||{},src=sourceById[p.source_id]||{};
+    const source=[src.title,ch.date?fmtDate(ch.date):null].filter(Boolean).join(' · ');
+    const statusAction=status==='open'
+      ? `<button class="review-action primary" data-action="reviewed">Mark reviewed</button><button class="review-action" data-action="dismissed">Dismiss</button>`
+      : `<button class="review-action primary" data-action="open">Reopen</button>`;
+    return `<div class="review-card priority-${item.priority} ${status}" data-review="${esc(item.id)}">
+      <div class="review-top"><div><div class="review-meta"><span class="badge b-cat">${esc(item.type)}</span>
+        <span class="badge b-obs">${esc(item.priority)}</span>${unseen.has(item.id)?'<span class="review-new">New</span>':''}</div>
+        <div class="review-title">${esc(item.title)}</div></div></div>
+      <div class="review-detail">${esc(item.detail)}</div>
+      ${source?`<div class="tag">${esc(source)}</div>`:''}
+      <div class="review-actions"><button class="review-action" data-action="evidence">Review evidence</button>${statusAction}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('view-review').innerHTML=
+    `<h2 class="section">Knowledge review inbox</h2>
+     <p class="sub">Turn the map into a working knowledge system: resolve tensions, answer open questions, verify uncertain extractions, and notice ideas gaining momentum. Review decisions stay in this browser across regenerated maps.</p>
+     ${reviewStorageAvailable?'':'<div class="review-warning">Browser storage is unavailable, so review decisions will last only until this page is reloaded.</div>'}
+     <div class="review-summary"><div class="review-stat"><b>${counts.open}</b><span>open</span></div>
+       <div class="review-stat"><b>${REVIEW_ITEMS.filter(i=>i.priority==='urgent'&&reviewStatus(i.id)==='open').length}</b><span>urgent tensions</span></div>
+       <div class="review-stat"><b>${counts.reviewed}</b><span>reviewed</span></div>
+       <div class="review-stat"><b>${counts.dismissed}</b><span>dismissed</span></div></div>
+     <div class="filterbar">${filters.map(([key,label,count])=>`<button class="fpill ${reviewFilter===key?'active':''}" data-rfilter="${key}">${label} (${count})</button>`).join('')}</div>
+     <div class="review-list">${cards||'<div class="ins-empty">Nothing in this view. Your review queue is clear.</div>'}</div>`;
+  document.querySelectorAll('#view-review [data-rfilter]').forEach(b=>b.onclick=()=>{reviewFilter=b.getAttribute('data-rfilter');renderReview();});
+  document.querySelectorAll('#view-review [data-review]').forEach(card=>{
+    const item=REVIEW_ITEMS.find(i=>i.id===card.getAttribute('data-review'));
+    card.querySelectorAll('[data-action]').forEach(b=>b.onclick=e=>{
+      e.stopPropagation();const action=b.getAttribute('data-action');
+      if(action==='evidence')inspectReviewItem(item);else setReviewStatus(item.id,action);
+    });
+  });
+  if(unseen.size){reviewState.seen=Array.from(new Set(reviewState.seen.concat(Array.from(unseen))));saveReviewState();}
+  updateReviewTab();
+}
 
 /* ---------- FLOW MAP (Minard-style flowing ribbons over reading progression) ---------- */
 let hiddenCats=new Set();
@@ -538,11 +671,12 @@ function setView(v){
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.getAttribute('data-view')===v));
   document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id==='view-'+v));
   if(v==='flow')renderFlow();
+  if(v==='review')renderReview();
 }
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>setView(t.getAttribute('data-view')));
 document.getElementById('q').addEventListener('input',e=>{setView('explorer');renderExplorer(e.target.value);});
 window.addEventListener('resize',()=>{if(document.getElementById('view-flow').classList.contains('active'))renderFlow();});
-renderFlow();renderInsights();renderExplorer('');renderSources();
+renderReview();renderFlow();renderInsights();renderExplorer('');renderSources();
 document.getElementById('noteClose').onclick=closeNote;
 document.getElementById('noteModal').onclick=e=>{if(e.target.id==='noteModal')closeNote();};
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeNote();});

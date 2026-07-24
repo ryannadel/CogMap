@@ -47,6 +47,10 @@ or dashboard.
 - Extracts concepts, claims, typed relationships, contradictions, and emergent insights.
 - Tracks provenance so nodes and insights link back to the source text.
 - Surfaces change, conflict, gaps, and attention-worthy themes across time.
+- Opens on a knowledge review inbox that prioritizes tensions, open questions,
+  uncertain extractions, and developing ideas.
+- Lets users inspect evidence, mark items reviewed, dismiss noise, and retain those
+  decisions locally across regenerated maps.
 - Rebuilds incrementally, re-processing only changed chunks where possible.
 - Ships with a GitHub Copilot / Claude Code skill for agent-assisted refreshes.
 - Outputs a portable HTML artifact with embedded data and no server requirement.
