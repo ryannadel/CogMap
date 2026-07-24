@@ -9,6 +9,9 @@ and this project uses semantic versioning for public releases.
 
 ### Added
 
+- Knowledge review inbox with prioritized tensions, questions, uncertain
+  extractions, and developing ideas; provenance-aware review actions; and locally
+  persisted reviewed/dismissed decisions.
 - MIT license for public use and redistribution.
 - Contribution guide with validation and skill-sync instructions.
 - GitHub Actions CI that compiles Python, runs tests, and verifies the mirrored

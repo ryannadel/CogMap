@@ -392,7 +392,13 @@ class CogMapPipelineTests(unittest.TestCase):
             data = json.loads(data_path.read_text(encoding="utf-8"))
             self.assertGreater(data["metadata"]["counts"]["sources"], 0)
             self.assertGreater(data["metadata"]["counts"]["chunks"], 0)
-            self.assertIn("CogMap", html.read_text(encoding="utf-8"))
+            html_text = html.read_text(encoding="utf-8")
+            self.assertIn("CogMap", html_text)
+            self.assertIn("Knowledge review inbox", html_text)
+            self.assertIn("data-view=\"review\"", html_text)
+            self.assertIn("localStorage.setItem(reviewStorageKey()", html_text)
+            self.assertIn("window.location.pathname", html_text)
+            self.assertIn("Review evidence", html_text)
 
     def test_publish_remote_parsing_and_url(self):
         cases = [
